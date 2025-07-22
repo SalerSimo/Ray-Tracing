@@ -1,0 +1,76 @@
+#ifndef GEOMETRY_H
+#define GEOMETRY_H
+
+typedef struct{
+    double x, y, z;
+    double norm;
+}Vector;
+
+typedef struct{
+    double x, y, z;
+}Point;
+
+typedef struct{
+    Point *p;
+    Vector *v;
+}Line;
+
+typedef struct{
+    double A, B, C, D;
+}Plane;
+
+
+// ───── POINT ─────
+
+// Constructor
+Point*  Point_init(double x, double y, double z);
+
+// Operations
+double  Point_distance(Point *a, Point *b);
+Point*  Point_traslate(Point *p, Vector *v);
+
+// Debug
+void    Point_print(Point *p);
+
+
+// ───── VECTOR ─────
+
+// Constructor
+Vector  Vector_init(double x, double y, double z);
+Vector  Vector_fromPoints(Point *a, Point *b);
+
+// Operations
+double  Vector_angle(Vector *v1, Vector *v2);
+Vector  Vector_normalize(Vector *v);
+Vector  Vector_scale(Vector *v, double scalar);
+Vector  Vector_sum(Vector *v1, Vector *v2);
+Vector  Vector_crossProduct(Vector *a, Vector *b);
+double  Vector_dot(Vector *v1, Vector *v2);
+
+// Debug
+void    Vector_print(Vector *v);
+
+
+// ───── LINE ─────
+
+// Contructor
+Line*   Line_init(Point *p, Vector *v);
+
+// Operations
+double  Line_Point_distance(Line *l, Point *p);
+Point*  Line_projectionPoint(Line *l, Point *p);
+
+// Debug
+void    Line_print(Line *l);
+
+
+// ───── PLANE ─────
+
+// Constructor
+Plane*  Plane_new(double A, double B, double C, double D);
+
+// Operations
+Vector  Plane_vectorNormal(Plane *plane);
+
+
+#endif // GEOMETRY_H
