@@ -24,7 +24,8 @@ Vector Triangle_getNormal(Triangle *t){
     Vector ab, ac;
     ab = Vector_fromPoints(t->a, t->b);
     ac = Vector_fromPoints(t->a, t->c);
-    return Vector_crossProduct(&ab, &ac);
+    Vector normal = Vector_crossProduct(&ab, &ac);
+    return Vector_normalize(&normal);
 }
 
 Surface *Surface_new(){
