@@ -8,6 +8,11 @@ Color Color_new(uint32_t color){
 }
 
 Color Color_scale(Color c, double factor){
+    if(factor <= 0)
+        return COLOR_BLACK;
+    else if(factor >= 1)
+        return c;
+
     uint32_t color = c.color;
     if (factor < 0) factor = 0;
     if (factor > 1) factor = 1;
@@ -25,6 +30,10 @@ Color Color_scale(Color c, double factor){
 }
 
 Color Color_blend(Color c1, Color c2, double t){
+    if(t <= 0)
+        return c1;
+    else if(t >= 1)
+        return c2;
     uint32_t colorA = c1.color;
     uint32_t colorB = c2.color;
     uint8_t rA = (colorA >> 16) & 0xFF;
