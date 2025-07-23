@@ -9,8 +9,6 @@
 #define LON_DIVS 20
 #define MAX_DEPTH 3
 
-#define COLOR_BLACK 0x000000
-
 typedef struct{
     Point *a, *b, *c;
 }Triangle;

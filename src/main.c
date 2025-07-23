@@ -8,8 +8,6 @@
 
 #define WIDTH 500
 #define HEIGHT 300
-#define COLOR_WHITE 0xffffff
-#define BACKGROUND_COLOR 0x000000
 
 
 typedef struct{
@@ -72,14 +70,14 @@ void *thread_function(void *args){
 
 Scene *createScene(){
     Point *camera = Point_init(0, 0, 15);
-    Surface *box = Surface_createBox(Point_init(-150, -100, -100), 300, 150, 300, 0, 0, Color_new(0x6E6E6E));
+    Surface *box = Surface_createBox(Point_init(-150, -100, -100), 300, 150, 300, 0, 0, COLOR_WHITE /*Color_new(0x6E6E6E)*/);
 
     Scene *scene = Scene_init();
     scene->cameraDistance = 1;
 
-    Surface *s2 = Surface_createSphere(Point_init(15, 5, 0), 2, 0, 0.5, Color_new(COLOR_RED));
-    Surface *sphere = Surface_createSphere(Point_init(0, 0, -30), 15, 0, 0.5, Color_new(COLOR_BLUE));
-    Surface *rect = Surface_createRectXZ(Point_init(50, -20, 0), -150, -100, 0.5, Color_new(COLOR_GREEN));
+    Surface *s2 = Surface_createSphere(Point_init(15, 5, 0), 2, 0, 0.5, COLOR_RED);
+    Surface *sphere = Surface_createSphere(Point_init(0, 0, -30), 15, 0, 0.5, COLOR_BLUE);
+    Surface *rect = Surface_createRectXZ(Point_init(50, -20, 0), -150, -100, 1, 0, COLOR_GREEN);
 
     int n = 4;
     Surface **list = malloc(n * sizeof(Surface*));

@@ -9,7 +9,7 @@ Color RayTracing(Scene *scene, Line *l, int depth){
     if(Line_Point_distance(l, scene->lightSource) <= 0.005 * Point_distance(l->p, scene->lightSource)){
         Vector v = Vector_fromPoints(l->p, scene->lightSource);
         if(Vector_dot(&v, l->v) > 0){
-            return Color_new(COLOR_WHITE);
+            return COLOR_WHITE;
         }
     }
     Triangle *t;
@@ -32,7 +32,7 @@ Color RayTracing(Scene *scene, Line *l, int depth){
             }
         }
     }
-    if(nearSurface == NULL) return Color_new(COLOR_BLACK);
+    if(nearSurface == NULL) return COLOR_BLACK;
 
     Vector vectorLight = Vector_fromPoints(intersectionPoint, scene->lightSource);
     vectorLight = Vector_normalize(&vectorLight);
@@ -62,7 +62,7 @@ Color RayTracing(Scene *scene, Line *l, int depth){
     }
     double factor = __max(0.1, Vector_dot(&vectorLight, &normal));
 
-    Color reflectedColor = Color_new(COLOR_BLACK);
+    Color reflectedColor = COLOR_BLACK;
     uint32_t color;
 
     Vector N = normal;
@@ -85,7 +85,7 @@ Color RayTracing(Scene *scene, Line *l, int depth){
     double specularStrength = nearSurface->smoothness;
     
     Color diffuseColor = inShadow ? Color_scale(nearSurface->color, 0.1) : Color_scale(nearSurface->color, diffuseStrength);
-    Color specularColor = inShadow ? Color_new(COLOR_BLACK) : Color_scale(Color_new(COLOR_WHITE), specularStrength * spec);
+    Color specularColor = inShadow ? COLOR_BLACK : Color_scale(COLOR_WHITE, specularStrength * spec);
     Color lightingColor = Color_add(diffuseColor, specularColor);
     Color finalColor;
 
