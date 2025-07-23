@@ -5,7 +5,7 @@
 
 Point *Surface_intersection(Surface *surface, Line *l, Triangle **p_t);
 
-Color RayTracing(Scene *scene, Line *l, int depth){
+Color TraceRay(Scene *scene, Line *l, int depth){
     if(Line_Point_distance(l, scene->lightSource) <= 0.005 * Point_distance(l->p, scene->lightSource)){
         Vector v = Vector_fromPoints(l->p, scene->lightSource);
         if(Vector_dot(&v, l->v) > 0){
@@ -97,7 +97,7 @@ Color RayTracing(Scene *scene, Line *l, int depth){
         Vector delta = Vector_scale(&normal, epsilon);
 
         Line *reflexLine = Line_init(Point_traslate(intersectionPoint, &delta), &reflex);
-        reflectedColor = RayTracing(scene, reflexLine, depth + 1);
+        reflectedColor = TraceRay(scene, reflexLine, depth + 1);
         finalColor = Color_blend(lightingColor, reflectedColor, nearSurface->reflexivity);
     }
     else{

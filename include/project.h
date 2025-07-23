@@ -5,5 +5,6 @@
 #include"geometry.h"
 #include"color.h"
 #include"raytracer.h"
+#include"scene.h"
 
 #endif

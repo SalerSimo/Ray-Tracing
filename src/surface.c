@@ -2,8 +2,7 @@
 #include<math.h>
 #include<stdio.h>
 #include<stdint.h>
-#include"project.h"
-
+#include"surface.h"
 
 Triangle *Triangle_init(Point *a, Point *b, Point *c){
     Triangle *t = malloc(sizeof(Triangle));
@@ -42,8 +41,8 @@ Surface *Surface_new(){
 }
 
 Surface *Surface_createSphere(Point *center, double radius, double reflexivity, double smoothness, Color color){
-    int total_points = (LAT_DIVS + 1) * LON_DIVS;
-    Point **points = malloc(total_points * sizeof(Point*));
+    int numPoints = (LAT_DIVS + 1) * LON_DIVS;
+    Point **points = malloc(numPoints * sizeof(Point*));
     Surface *sphere = Surface_new();
 
     int index = 0;
@@ -70,7 +69,7 @@ Surface *Surface_createSphere(Point *center, double radius, double reflexivity, 
             int curr = i * LON_DIVS + j;
             int next = curr + LON_DIVS;
 
-            int right = (j + 1) % LON_DIVS; // wrap around
+            int right = (j + 1) % LON_DIVS;
             int curr_right = i * LON_DIVS + right;
             int next_right = (i + 1) * LON_DIVS + right;
 
@@ -106,7 +105,7 @@ double Surface_area(Surface *surface){
     return area;
 }
 
-Surface *Surface_createRectXY(Point *origin, double width, double height, Color color){
+Surface *Surface_createRectXY(Point *origin, double width, double height, double reflexivity, double smoothness, Color color){
     Surface *rect = Surface_new();
     if(rect == NULL) return NULL;
 
@@ -132,11 +131,12 @@ Surface *Surface_createRectXY(Point *origin, double width, double height, Color 
     rect->triangles[1] = Triangle_init(p1, p2, p3);
 
     rect->color = color;
-    rect->type = GENERIC;
+    rect->reflexivity = reflexivity;
+    rect->smoothness = smoothness;
     return rect;
 }
 
-Surface *Surface_createRectXZ(Point *origin, double width, double height, double reflexivity, Color color){
+Surface *Surface_createRectXZ(Point *origin, double width, double height, double reflexivity, double smoothness, Color color){
     Surface *rect = Surface_new();
     if(rect == NULL) return NULL;
 
@@ -162,8 +162,8 @@ Surface *Surface_createRectXZ(Point *origin, double width, double height, double
     rect->triangles[1] = Triangle_init(p1, p2, p3);
 
     rect->color = color;
-    rect->type = GENERIC;
     rect->reflexivity = reflexivity;
+    rect->smoothness = smoothness;
     return rect;
 }
 
@@ -209,28 +209,7 @@ Surface *Surface_createBox(Point *origin, double width, double height, double de
     }
 
     box->color = color;
-    box->type = GENERIC;
     box->reflexivity = reflexivity;
     box->smoothness = smoothness;
     return box;
-}
-
-Scene *Scene_init(){
-    Scene *s = malloc(sizeof(Scene*));
-    s->numSurfaces = 0;
-    s->surfaces = NULL;
-    s->rotationAngle = 0;
-    s->camera = NULL;
-    s->cameraDistance = 0;
-    s->lightSource = NULL;
-    return s;
-}
-
-void Scene_fill(Scene *s, Point *lightSource, Surface **surfaces, int numSurfaces){
-    s->lightSource = lightSource;
-    s->numSurfaces = numSurfaces;
-    s->surfaces = malloc(numSurfaces * sizeof(Surface));
-    for(int i = 0; i < numSurfaces; i++){
-        s->surfaces[i] = surfaces[i];
-    }
 }
