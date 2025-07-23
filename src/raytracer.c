@@ -39,7 +39,7 @@ Color TraceRay(Scene *scene, Line *l, int depth){
 
     int inShadow = 0;
     for(int i = 0; i < scene->numSurfaces; i++){
-        if(scene->surfaces[i] == nearSurface) continue;
+        if(scene->surfaces[i] == nearSurface || scene->surfaces[i] == NULL) continue;
         Line *lightLine =  Line_init(intersectionPoint, &vectorLight);
         Point *p = Surface_intersection(scene->surfaces[i], lightLine, &t);
         if(p != NULL){
