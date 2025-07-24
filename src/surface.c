@@ -168,6 +168,37 @@ Surface *Surface_createRectXZ(Point *origin, double width, double height, double
     return rect;
 }
 
+Surface *Surface_createRectYZ(Point *origin, double width, double height, double reflexivity, double smoothness, Color color){
+    Surface *rect = Surface_new();
+    if(rect == NULL) return NULL;
+
+    double x, y, z;
+    x = origin->x;
+    y = origin->y;
+    z = origin->z;
+
+    rect->center = Point_init(x, y + height/2, z + width/2);
+    rect->maxDistanceFromCenter = sqrt(pow(width/2, 2) + pow(height/2, 2));
+
+    Point *p1, *p2, *p3;
+
+    p1 = Point_init(x, y, z + width);
+    p2 = Point_init(x, y + height, z);
+    p3 = Point_init(x, y + height, z + width);
+
+
+    rect->numTriangles = 2;
+
+    rect->triangles = malloc(rect->numTriangles *sizeof(Triangle*));
+    rect->triangles[0] = Triangle_init(origin, p1, p2);
+    rect->triangles[1] = Triangle_init(p1, p2, p3);
+
+    rect->color = color;
+    rect->reflexivity = reflexivity;
+    rect->smoothness = smoothness;
+    return rect;
+}
+
 Surface *Surface_createBox(Point *origin, double width, double height, double depth, double reflexivity, double smoothness, Color color) {
     Surface *box = Surface_new();
     if (box == NULL) return NULL;
