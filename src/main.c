@@ -62,30 +62,33 @@ void *thread_function(void *args){
 }
 
 Scene *createScene(){
-    Point *camera = Point_init(0, 0, 15);
-    Surface *box = Surface_createBox(Point_init(-150, -100, -100), 300, 150, 300, 0, 0, COLOR_WHITE /*Color_new(0x6E6E6E)*/);
+    Point *camera = Point_init(0, 0, 0);
 
     Scene *scene = Scene_init();
     scene->cameraDistance = 1;
 
-    Surface *s2 = Surface_createSphere(Point_init(15, 5, 0), 2, 0, 0.5, COLOR_RED);
-    Surface *sphere = Surface_createSphere(Point_init(0, 0, -30), 15, 0, 0.5, COLOR_BLUE);
-    Surface *rect = Surface_createRectXZ(Point_init(50, -20, 0), -150, -100, 1, 0, COLOR_GREEN);
+    Surface *sphere1 = Surface_createSphere(Point_init(15, 0, -20), 7.5, 1, 0.5, COLOR_RED);
+    Surface *sphere2 = Surface_createSphere(Point_init(-15, 0, -20), 7.5, 0.2, 0.5, COLOR_BLUE);
 
-    int n = 4;
+    Surface *rightWall = Surface_createRectYZ(Point_init(100, -75, -100), 200, 150, 0, 0, COLOR_GREEN);
+    Surface *leftWall = Surface_createRectYZ(Point_init(-100, -75, -100), 200, 150, 0, 0, COLOR_GREEN);
+    Surface *frontWall = Surface_createRectXY(Point_init(-100, -75, -100), 200, 150, 0, 0.1, Color_scale(COLOR_RED, 0.9));
+    Surface *backWall = Surface_createRectXY(Point_init(-100, -75, 100), 200, 150, 0, 0, COLOR_RED);
+    Surface *topWall = Surface_createRectXZ(Point_init(-100, 75, -100), 200, 200, 0, 0, COLOR_BLUE);
+    Surface *baseWall = Surface_createRectXZ(Point_init(-100, -75, -100), 200, 200, 0, 0, COLOR_BLUE);
+
+    int n = 8;
     Surface **list = malloc(n * sizeof(Surface*));
-    list[0] = sphere;
-    list[1] = s2;
-    list[2] = rect;
-    list[3] = box;
+    list[0] = sphere1;
+    list[1] = sphere2;
+    list[2] = frontWall;
+    list[3] = rightWall;
+    list[4] = leftWall;
+    list[5] = topWall;
+    list[6] = baseWall;
+    list[7] = backWall;
 
-    Vector v = Vector_fromPoints(sphere->center, s2->center);
-    double t = 2;
-    Point *lightSource = Point_init(
-        sphere->center->x + v.x*t,
-        sphere->center->y + v.y*t,
-        sphere->center->z + v.z*t
-    );
+    Point *lightSource = Point_init(5, 5, 5);
     Scene_fill(scene,lightSource, list, n);
     scene->camera = camera;
 }
