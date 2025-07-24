@@ -6,6 +6,8 @@
 #include"scene.h"
 #include"color.h"
 
-Color TraceRay(Scene *scene, Line *l, int depth);
+#define MAX_DEPTH 3
+
+Color TraceRay(Scene *scene, Line *l);
 
 #endif //RAYTRACER_H

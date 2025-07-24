@@ -59,7 +59,7 @@ void *thread_function(void *args){
             Vector direction = Vector_fromPoints(camera, p);
             Line *l = Line_init(camera, &direction);
 
-            Color color = RayTracing(scene, l, 0);
+            Color color = TraceRay(scene, l);
 
             SDL_Rect pixel = (SDL_Rect) {i, j, 1, 1};
             SDL_FillSurfaceRect(surface, &pixel, Color_extract(color));

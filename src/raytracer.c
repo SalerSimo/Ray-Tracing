@@ -4,8 +4,13 @@
 #include"raytracer.h"
 
 Point *Surface_intersection(Surface *surface, Line *l, Triangle **p_t);
+Color TraceRayR(Scene *scene, Line *l, int depth);
 
-Color TraceRay(Scene *scene, Line *l, int depth){
+Color TraceRay(Scene *scene, Line *l){
+    return TraceRayR(scene, l, 0);
+}
+
+Color TraceRayR(Scene *scene, Line *l, int depth){
     if(Line_Point_distance(l, scene->lightSource) <= 0.005 * Point_distance(l->p, scene->lightSource)){
         Vector v = Vector_fromPoints(l->p, scene->lightSource);
         if(Vector_dot(&v, l->v) > 0){
@@ -93,11 +98,11 @@ Color TraceRay(Scene *scene, Line *l, int depth){
         Vector dir = Vector_normalize(l->v);
         Vector tang = Vector_scale(&normal, -2 * Vector_dot(&normal, &dir));
         Vector reflex = Vector_sum(&dir, &tang);
-        double epsilon = 1e-2;
+        double epsilon = 1e-5;
         Vector delta = Vector_scale(&normal, epsilon);
 
         Line *reflexLine = Line_init(Point_traslate(intersectionPoint, &delta), &reflex);
-        reflectedColor = TraceRay(scene, reflexLine, depth + 1);
+        reflectedColor = TraceRayR(scene, reflexLine, depth + 1);
         finalColor = Color_blend(lightingColor, reflectedColor, nearSurface->reflexivity);
     }
     else{

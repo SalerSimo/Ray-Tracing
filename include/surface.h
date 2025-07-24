@@ -7,7 +7,6 @@
 
 #define LAT_DIVS 20
 #define LON_DIVS 20
-#define MAX_DEPTH 3
 
 typedef struct{
     Point *a, *b, *c;
