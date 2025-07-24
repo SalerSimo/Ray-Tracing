@@ -42,19 +42,12 @@ void *thread_function(void *args){
             double x, y, z;
             x = -viewportWidth / 2 + viewportWidth*(i+0.5)/width;
             y = camera->y + viewportHeight/2 - viewportHeight*(j+0.5)/height;
-            z = - distance;
+            z = -distance;
 
-            x = camera->x + z*sin(alpha) + x*cos(alpha);
-            z = camera->z + z*cos(alpha) - x*sin(alpha);
-
-            double x_camera = -viewportWidth / 2 + viewportWidth * (i + 0.5) / width;
-            double y_camera = camera->y + viewportHeight / 2 - viewportHeight * (j + 0.5) / height;
-            double z_camera = -distance;
-
-            double rotatedX = x_camera * cos(alpha) - z_camera * sin(alpha);
-            double rotatedZ = x_camera * sin(alpha) + z_camera * cos(alpha);
-
-            p = Point_init(camera->x + rotatedX, y_camera, camera->z + rotatedZ);
+            double rotatedX = camera->x + z*sin(alpha) + x*cos(alpha);
+            double rotatedZ = camera->z + z*cos(alpha) - x*sin(alpha);
+            
+            p = Point_init(rotatedX, y, rotatedZ);
 
             Vector direction = Vector_fromPoints(camera, p);
             Line *l = Line_init(camera, &direction);
@@ -114,8 +107,11 @@ void SimulateScene(Scene *scene, SDL_Window *window){
             else if(event.type == SDL_EVENT_MOUSE_BUTTON_DOWN){
                 double angleStep = 10;
                 angleStep = angleStep * M_PI / 180;
-                if(event.button.button == SDL_BUTTON_LEFT){
+                if(event.button.button == SDL_BUTTON_RIGHT){
                     angleStep = -angleStep;
+                }
+                else if(event.button.button != SDL_BUTTON_LEFT){
+                    continue;
                 }
 
                 for(int i = 0; i < numFrame; i++){
@@ -127,7 +123,7 @@ void SimulateScene(Scene *scene, SDL_Window *window){
                 SDL_Keycode key = event.key.key;
                 double moveStep = 4;
                 double deltaX = 0, deltaZ = 0;
-                double angle = -scene->rotationAngle;
+                double angle = scene->rotationAngle;
                 if(key == SDLK_W){
                     deltaZ = -moveStep*cos(angle);
                     deltaX = -moveStep*sin(angle);
