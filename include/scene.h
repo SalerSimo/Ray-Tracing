@@ -7,16 +7,48 @@
 #include"geometry.h"
 #include"surface.h"
 
+/**
+ * Represents a 3D scene for ray tracing.
+ *
+ * Contains camera position, light source, and an array of surfaces that define the geometry.
+ * It also includes camera-related properties like the viewing distance and rotation angle.
+ */
 typedef struct{
+    /** Pointer to the camera position. */
     Point *camera;
+    /** Distance between the camera and the view plane.*/
     double cameraDistance;
+    /** 
+     *  Rotational angle in radians around the Y-axis, applied to the camera.
+     *  An angle of 0 means the camera is facing the negative Z-axis.
+     *  A positive angle corresponds to anti-clockwise rotation.
+     */
     double rotationAngle;
+    /** Array of pointers to the surfaces in the scene. */
     Surface **surfaces;
-    int numSurfaces;
+    /** Number of surfaces in the scene. */
+    unsigned int numSurfaces;
+    /** Pointer to the position of the light source of the scene. */
     Point *lightSource;
 }Scene;
 
+
+/**
+ * Creates an empty scene.
+ * 
+ * It sets all pointers to NULL and all numeric values to 0.
+ * @return Pointer to the allocated scene or NULL if allocation fails.
+ */
 Scene *Scene_init();
+
+/**
+ * Initializes a scene with the given light source and surfaces.
+ * 
+ * @param s The scene to fill.
+ * @param lightSource Pointer to the position of the light source.
+ * @param surfaces Array of pointers to the surfaces to include in the scene.
+ * @param numSurfaces Number of surfaces in the array.
+ */
 void Scene_fill(Scene *s, Point *lightSource, Surface **surfaces, int numSurfaces);
 
 #endif //SCENE_H
