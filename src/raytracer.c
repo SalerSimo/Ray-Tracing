@@ -37,7 +37,7 @@ Color TraceRayR(Scene *scene, Line *l, int depth){
             }
         }
     }
-    if(nearSurface == NULL) return COLOR_BLACK;
+    if(nearSurface == NULL) return BACKGROUND_COLOR;
 
     Vector vectorLight = Vector_fromPoints(intersectionPoint, scene->lightSource);
     vectorLight = Vector_normalize(&vectorLight);

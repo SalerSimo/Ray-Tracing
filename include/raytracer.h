@@ -7,6 +7,7 @@
 #include"color.h"
 
 #define MAX_DEPTH 3
+#define BACKGROUND_COLOR Color_new(0xA7ECFF)
 
 /**
  * Traces a single ray in the scene and returns the resulting color.
