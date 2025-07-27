@@ -59,4 +59,6 @@ Color Color_add(Color c1, Color c2);
  */
 uint32_t Color_extract(Color c);
 
+Color Color_average(Color* colors, int n);
+
 #endif //COLOR_H

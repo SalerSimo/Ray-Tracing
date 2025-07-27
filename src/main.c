@@ -16,49 +16,74 @@ typedef struct{
     Scene *scene;
     int i;
     int start, end;
+    int antiAliasingFactor;
 }threadData;
 
-void Display(Scene *scene, SDL_Window *window, int nThread, bool verbose);
+void Display(Scene *scene, SDL_Window *window, int nThread, bool verbose, int antiAliasingFactor);
 
-void *thread_function(void *args){
-    threadData *data = (threadData*)args;
+Color GetPixelColor(double i, double j, threadData *data){
     Point *p;
     Scene *scene = data->scene;
     Point *camera = scene->camera;
     SDL_Surface *surface = data->surface;
-    SDL_Window *window = data->window;
     double distance = scene->cameraDistance;
+    int factor = data->antiAliasingFactor;
     double aspectRatio = (double)surface->w / surface->h;
-    double viewportHeight = 3; // or whatever field of view you want
+    double viewportHeight = 3;
     double viewportWidth = viewportHeight * aspectRatio;
 
-    int width = surface->w;
-    int height = surface->h;
+    int width = surface->w*factor;
+    int height = surface->h*factor;
 
     double alpha = scene->rotationAngle;
 
-    for(int i = data->start; i < data->end; i++){
-        for(int j = 0; j < height; j++){
-            double x, y, z;
-            x = -viewportWidth / 2 + viewportWidth*(i+0.5)/width;
-            y = camera->y + viewportHeight/2 - viewportHeight*(j+0.5)/height;
-            z = -distance;
+    double x, y, z;
+    x = -viewportWidth / 2 + viewportWidth*(i+0.5)/width;
+    y = camera->y + viewportHeight/2 - viewportHeight*(j+0.5)/height;
+    z = -distance;
+    double rotatedX = camera->x + z*sin(alpha) + x*cos(alpha);
+    double rotatedZ = camera->z + z*cos(alpha) - x*sin(alpha);
+    
+    p = Point_init(rotatedX, y, rotatedZ);
 
-            double rotatedX = camera->x + z*sin(alpha) + x*cos(alpha);
-            double rotatedZ = camera->z + z*cos(alpha) - x*sin(alpha);
+    Vector direction = Vector_fromPoints(camera, p);
+    Line *l = Line_init(camera, &direction);
+
+    return TraceRay(scene, l);
+}
+
+void *thread_function(void *args){
+    threadData *data = (threadData*)args;
+    int factor = data->antiAliasingFactor;
+    int height = data->surface->h;
+    SDL_Surface *surface = data->surface;
+    SDL_Window *window = data->window;
+    
+    Color *colors = NULL;
+    if(data->antiAliasingFactor > 1) colors = malloc(factor * factor * sizeof(Color));
+
+    for(int i = data->start*factor; i < data->end*factor; i+=factor){
+        for(int j = 0; j < height*factor; j+=factor){
+            Color color;
             
-            p = Point_init(rotatedX, y, rotatedZ);
+            if(factor == 1){
+                color = GetPixelColor(i, j, data);
+            }
+            else{
+                for(int k = i; k < i + factor; k++){
+                    for(int l = j; l < j + factor; l++){
+                        colors[(k-i)*factor + (l-j)] = GetPixelColor(k, l, data);
+                    }
+                }
+                color = Color_average(colors, factor*factor);
+            }
 
-            Vector direction = Vector_fromPoints(camera, p);
-            Line *l = Line_init(camera, &direction);
-
-            Color color = TraceRay(scene, l);
-
-            SDL_Rect pixel = (SDL_Rect) {i, j, 1, 1};
+            SDL_Rect pixel = (SDL_Rect) {i/factor, j/factor, 1, 1};
             SDL_FillSurfaceRect(surface, &pixel, Color_extract(color));
         }
         SDL_UpdateWindowSurface(window);
     }
+    if(factor > 1) free(colors);
 }
 
 Scene *createScene(){
@@ -94,8 +119,9 @@ Scene *createScene(){
 }
 
 void SimulateScene(Scene *scene, SDL_Window *window){
-    int nThread = 20;
-    Display(scene, window, nThread, 1);
+    int nThread = 12;
+    int antiAliasingFactor = 1;
+    Display(scene, window, nThread, 1, antiAliasingFactor);
 
     SDL_Event event;
     int numFrame = 1;
@@ -105,7 +131,7 @@ void SimulateScene(Scene *scene, SDL_Window *window){
                 return;
             }
             else if(event.type == SDL_EVENT_WINDOW_RESIZED){
-                Display(scene, window, nThread, 1);
+                Display(scene, window, nThread, 1, antiAliasingFactor);
             }
             else if(event.type == SDL_EVENT_MOUSE_BUTTON_DOWN){
                 double angleStep = 10;
@@ -119,7 +145,7 @@ void SimulateScene(Scene *scene, SDL_Window *window){
 
                 for(int i = 0; i < numFrame; i++){
                     scene->rotationAngle += angleStep / numFrame;
-                    Display(scene, window, nThread, 0);
+                    Display(scene, window, nThread, 0, antiAliasingFactor);
                 }
             }
             else if(event.type == SDL_EVENT_KEY_DOWN){
@@ -146,7 +172,7 @@ void SimulateScene(Scene *scene, SDL_Window *window){
                 for(int i = 0; i < numFrame; i++){
                     scene->camera->x += deltaX / numFrame;
                     scene->camera->z += deltaZ / numFrame;
-                    Display(scene, window, nThread, 0);
+                    Display(scene, window, nThread, 0, antiAliasingFactor);
                 }
             }
         }
@@ -176,7 +202,7 @@ int main() {
     SimulateScene(scene, window);
 }
 
-void Display(Scene *scene, SDL_Window *window, int nThread, bool verbose){
+void Display(Scene *scene, SDL_Window *window, int nThread, bool verbose, int antiAliasingFactor){
     pthread_t *tid = malloc(nThread * sizeof(pthread_t));
     threadData **thread_data = malloc(nThread * sizeof(threadData*));
     SDL_Surface *surface = SDL_GetWindowSurface(window);
@@ -188,6 +214,7 @@ void Display(Scene *scene, SDL_Window *window, int nThread, bool verbose){
         thread_data[i]->scene = scene;
         thread_data[i]->start = i * surface->w / nThread;
         thread_data[i]->end = (i + 1) * surface->w / nThread;
+        thread_data[i]->antiAliasingFactor = antiAliasingFactor;
 
         pthread_create(&tid[i], NULL, thread_function, thread_data[i]);
     }

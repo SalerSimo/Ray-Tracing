@@ -68,3 +68,28 @@ Color Color_add(Color c1, Color c2){
 uint32_t Color_extract(Color c){
     return c.color;
 }
+
+Color Color_average(Color *colors, int n) {
+    if (n == 0) return COLOR_BLACK;
+    if(n == 1) return colors[0];
+
+    uint64_t sum_r = 0, sum_g = 0, sum_b = 0;
+
+    for (size_t i = 0; i < n; ++i) {
+        uint32_t color = Color_extract(colors[i]);
+
+        uint8_t r = (color >> 16) & 0xFF;
+        uint8_t g = (color >> 8)  & 0xFF;
+        uint8_t b = color & 0xFF;
+
+        sum_r += r;
+        sum_g += g;
+        sum_b += b;
+    }
+
+    uint8_t avg_r = sum_r / n;
+    uint8_t avg_g = sum_g / n;
+    uint8_t avg_b = sum_b / n;
+
+    return Color_new((avg_r << 16) | (avg_g << 8) | avg_b);
+}
