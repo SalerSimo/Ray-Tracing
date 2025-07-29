@@ -14,14 +14,17 @@ typedef struct{
     SDL_Surface *surface;
     SDL_Window *window;
     Scene *scene;
-    int i;
-    int start, end;
+    int index, nThread;
+    int *starts, *ends;
+    int *threadStates;
+    int *currents, *helped;
     int antiAliasingFactor;
-}threadData;
+    pthread_mutex_t *mutex;
+}ThreadData;
 
 void Display(Scene *scene, SDL_Window *window, int nThread, bool verbose, int antiAliasingFactor);
 
-Color GetPixelColor(double i, double j, threadData *data){
+Color GetPixelColor(double i, double j, ThreadData *data){
     Point *p;
     Scene *scene = data->scene;
     Point *camera = scene->camera;
@@ -53,7 +56,8 @@ Color GetPixelColor(double i, double j, threadData *data){
 }
 
 void *thread_function(void *args){
-    threadData *data = (threadData*)args;
+    ThreadData *data = (ThreadData*)args;
+    int index = data->index;
     int factor = data->antiAliasingFactor;
     int height = data->surface->h;
     SDL_Surface *surface = data->surface;
@@ -62,7 +66,10 @@ void *thread_function(void *args){
     Color *colors = NULL;
     if(data->antiAliasingFactor > 1) colors = malloc(factor * factor * sizeof(Color));
 
-    for(int i = data->start*factor; i < data->end*factor; i+=factor){
+    for(int i = data->starts[index]; i < data->ends[index]; i+=factor){
+        pthread_mutex_lock(&data->mutex[index]);
+        data->currents[index] = i;
+        pthread_mutex_unlock(&data->mutex[index]);
         for(int j = 0; j < height*factor; j+=factor){
             Color color;
             
@@ -84,6 +91,27 @@ void *thread_function(void *args){
         SDL_UpdateWindowSurface(window);
     }
     if(factor > 1) free(colors);
+    pthread_mutex_lock(&data->mutex[index]);
+    data->threadStates[index] = 1;
+    pthread_mutex_unlock(&data->mutex[index]);
+
+    pthread_t tid;
+    for(int i = 0; i < data->nThread; i++){
+        pthread_mutex_lock(&data->mutex[i]);
+        if(data->threadStates[i] == 0 && data->helped[i] == 0){
+            data->helped[i] = 1;
+            data->ends[index] = data->ends[i];
+            data->ends[i] = (data->currents[i] + data->ends[i]) / 2;
+            data->starts[index] = data->ends[i];
+            pthread_mutex_unlock(&data->mutex[i]);
+
+            pthread_create(&tid, NULL, thread_function, data);
+            pthread_join(tid, NULL);
+            break;
+        }else{
+            pthread_mutex_unlock(&data->mutex[i]);
+        }
+    }
 }
 
 Scene *createScene(){
@@ -205,19 +233,40 @@ int main() {
 
 void Display(Scene *scene, SDL_Window *window, int nThread, bool verbose, int antiAliasingFactor){
     pthread_t *tid = malloc(nThread * sizeof(pthread_t));
-    threadData **thread_data = malloc(nThread * sizeof(threadData*));
     SDL_Surface *surface = SDL_GetWindowSurface(window);
-    clock_t start = clock();
-    for (int i = 0; i < nThread; i++) {
-        thread_data[i] = malloc(sizeof(threadData));
-        thread_data[i]->surface = surface;
-        thread_data[i]->window = window;
-        thread_data[i]->scene = scene;
-        thread_data[i]->start = i * surface->w / nThread;
-        thread_data[i]->end = (i + 1) * surface->w / nThread;
-        thread_data[i]->antiAliasingFactor = antiAliasingFactor;
 
-        pthread_create(&tid[i], NULL, thread_function, thread_data[i]);
+    ThreadData **threadDatas = malloc(nThread * sizeof(ThreadData*));
+    int *starts = malloc(nThread * sizeof(int));
+    int *ends = malloc(nThread * sizeof(int));
+    int *currents = calloc(nThread, sizeof(int));
+    int *helped = calloc(nThread, sizeof(int));
+    int *threadStates = calloc(nThread, sizeof(int));
+    pthread_mutex_t *mutex = malloc(nThread * sizeof(pthread_mutex_t));
+    clock_t start = clock();
+
+    for (int i = 0; i < nThread; i++) {
+        pthread_mutex_init(&mutex[i], NULL);
+        starts[i] = i * surface->w / nThread * antiAliasingFactor;
+        ends[i] = (i + 1) * surface->w / nThread * antiAliasingFactor;
+
+        threadDatas[i] = malloc(sizeof(ThreadData));
+        threadDatas[i]->threadStates = threadStates;
+        threadDatas[i]->index = i;
+        threadDatas[i]->nThread = nThread;
+        threadDatas[i]->mutex = mutex;
+
+        threadDatas[i]->surface = surface;
+        threadDatas[i]->window = window;
+        threadDatas[i]->scene = scene;
+        threadDatas[i]->starts = starts;
+        threadDatas[i]->ends = ends;
+        threadDatas[i]->currents = currents;
+        threadDatas[i]->helped = helped;
+        threadDatas[i]->antiAliasingFactor = antiAliasingFactor;
+    }
+
+    for(int i = 0; i < nThread; i++){
+        pthread_create(&tid[i], NULL, thread_function, threadDatas[i]);
     }
     for(int i = 0; i < nThread; i++){
         pthread_join(tid[i], NULL);
