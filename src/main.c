@@ -113,8 +113,8 @@ Scene *createScene(){
     list[6] = baseWall;
     list[7] = backWall;
 
-    Point *lightSource = Point_init(5, 5, 5);
-    Scene_fill(scene,lightSource, list, n);
+    Light *lightSource = Light_new(Point_init(15, 10, -10), 1, COLOR_WHITE);
+    Scene_fill(scene, lightSource, list, n);
     scene->camera = camera;
 }
 
@@ -195,6 +195,7 @@ SDL_Window* InitWindow(){
 }
 
 int main() {
+    srand(time(NULL));
     SDL_Window* window = InitWindow();
     if(window == NULL) return 1;
 

@@ -93,3 +93,23 @@ Color Color_average(Color *colors, int n) {
 
     return Color_new((avg_r << 16) | (avg_g << 8) | avg_b);
 }
+
+Color Color_multiply(Color c1, Color c2){
+    uint32_t colorA = c1.color;
+    uint32_t colorB = c2.color;
+    uint8_t rA = (colorA >> 16) & 0xFF;
+    uint8_t gA = (colorA >> 8) & 0xFF;
+    uint8_t bA = colorA & 0xFF;
+
+    uint8_t rB = (colorB >> 16) & 0xFF;
+    uint8_t gB = (colorB >> 8) & 0xFF;
+    uint8_t bB = colorB & 0xFF;
+
+    uint8_t r = rA * rB / 255;
+    uint8_t g = gA * gB / 255;
+    uint8_t b = bA * bB / 255;
+
+    Color result;
+    result.color = (r << 16) | (g << 8) | b;
+    return result;
+}

@@ -8,6 +8,7 @@
 #define COLOR_RED Color_new(0xff0000)
 #define COLOR_GREEN Color_new(0x00ff00)
 #define COLOR_BLUE Color_new(0x0000ff)
+#define COlOR_YELLOW Color_new(0xffff00)
 
 typedef struct{
     uint32_t color;
@@ -60,5 +61,7 @@ Color Color_add(Color c1, Color c2);
 uint32_t Color_extract(Color c);
 
 Color Color_average(Color* colors, int n);
+
+Color Color_multiply(Color c1, Color c2);
 
 #endif //COLOR_H

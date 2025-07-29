@@ -38,12 +38,7 @@ Vector Vector_crossProduct(Vector *a, Vector *b){
     x = a->y * b->z - a->z * b->y;
     y = a->z * b->x - a->x * b->z;
     z = a->x * b->y - a->y * b->x;
-    Vector v;
-    v.x = x;
-    v.y = y;
-    v.z = z;
-    v.norm = sqrt(pow(x, 2) + pow(y, 2) + pow(z, 2));
-    return v;
+    return Vector_init(x, y, z);
 }
 
 double Vector_dot(Vector *v1, Vector *v2){
@@ -129,4 +124,25 @@ Point *Line_projectionPoint(Line *l, Point *p){
 
 Vector Vector_sum(Vector *v1, Vector *v2){
     return Vector_init(v1->x + v2->x, v1->y + v2->y, v1->z + v2->z);
+}
+
+int Vector_equal(Vector *v1, Vector *v2){
+    return v1->x == v2->x && v1->y == v2->y && v1->z == v2->z;
+}
+
+Vector Vector_perpendicular(Vector *v){
+    Vector e = Vector_init(1, 0, 0);
+    if(Vector_equal(v, &e)){
+        e = Vector_init(0, 1, 0);
+    }
+    return Vector_crossProduct(v, &e);
+}
+
+Vector Vector_rotate(Vector *v, Vector *axis, double angle){
+    Vector rotated1, rotated2;
+    *axis = Vector_normalize(axis);
+    rotated1 = Vector_scale(v, cos(angle));
+    rotated2 = Vector_crossProduct(v, axis);
+    rotated2 = Vector_scale(&rotated2, sin(angle));
+    return Vector_sum(&rotated1, &rotated2);
 }

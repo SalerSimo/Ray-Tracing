@@ -3,6 +3,9 @@
 #include<math.h>
 #include"raytracer.h"
 
+#define SHADOW_SAMPLES 50
+
+
 Point *Surface_intersection(Surface *surface, Line *l, Triangle **p_t);
 Color TraceRayR(Scene *scene, Line *l, int depth);
 
@@ -10,19 +13,31 @@ Color TraceRay(Scene *scene, Line *l){
     return TraceRayR(scene, l, 0);
 }
 
-Color TraceRayR(Scene *scene, Line *l, int depth){
-    if(Line_Point_distance(l, scene->lightSource) <= 0.005 * Point_distance(l->p, scene->lightSource)){
-        Vector v = Vector_fromPoints(l->p, scene->lightSource);
-        if(Vector_dot(&v, l->v) > 0){
-            return COLOR_WHITE;
+int isInShadow(Scene *scene, Surface *nearSurface, Point *intersectionPoint, Point *lightPoint){
+    Vector toLight =  Vector_fromPoints(intersectionPoint, lightPoint);
+    Line *shadowRay = Line_init(intersectionPoint, &toLight);
+    for (int i = 0; i < scene->numSurfaces; i++) {
+        if (scene->surfaces[i] == nearSurface || scene->surfaces[i] == NULL || scene->surfaces[i]->type == LIGHT) continue;
+        Triangle *t;
+        Point *p = Surface_intersection(scene->surfaces[i], shadowRay, &t);
+        if (p != NULL) {
+            double distToObj = Point_distance(p, intersectionPoint);
+            double distToLight = Point_distance(lightPoint, intersectionPoint);
+            if (distToObj < distToLight - 1e-5) {
+                return 1;
+            }
         }
     }
+    return 0;
+}
+
+Color TraceRayR(Scene *scene, Line *l, int depth){
     Triangle *t;
     Surface *nearSurface = NULL;
     double minDistance = -1;
     Point *intersectionPoint = NULL;
     Triangle *intersectionTriangle = NULL;
-    Vector normal;
+    Point *lightPosition = scene->lightSource->position;
 
     for(int i = 0; i < scene->numSurfaces; i++){
         if(scene->surfaces[i] == NULL) continue;
@@ -37,24 +52,13 @@ Color TraceRayR(Scene *scene, Line *l, int depth){
             }
         }
     }
-    if(nearSurface == NULL) return BACKGROUND_COLOR;
+    if(nearSurface == NULL) return Color_multiply(BACKGROUND_COLOR, scene->lightSource->color);
+    if (nearSurface->type == LIGHT) return nearSurface->color;
 
-    Vector vectorLight = Vector_fromPoints(intersectionPoint, scene->lightSource);
+    Vector vectorLight = Vector_fromPoints(intersectionPoint, lightPosition);
     vectorLight = Vector_normalize(&vectorLight);
 
-    int inShadow = 0;
-    for(int i = 0; i < scene->numSurfaces; i++){
-        if(scene->surfaces[i] == nearSurface || scene->surfaces[i] == NULL) continue;
-        Line *lightLine =  Line_init(intersectionPoint, &vectorLight);
-        Point *p = Surface_intersection(scene->surfaces[i], lightLine, &t);
-        if(p != NULL){
-            Vector v = Vector_fromPoints(lightLine->p, p);
-            if (Vector_dot(lightLine->v, &v) > 0 && Point_distance(p, intersectionPoint) < Point_distance(scene->lightSource, intersectionPoint)) {
-                inShadow = 1;
-            }
-        }
-    }
-
+    Vector normal;
     if(nearSurface->type == SPHERE){
         normal = Vector_fromPoints(nearSurface->center, intersectionPoint);
     }
@@ -65,7 +69,51 @@ Color TraceRayR(Scene *scene, Line *l, int depth){
     if(Vector_dot(&normal, l->v) > 0){
         normal = Vector_scale(&normal, -1);
     }
-    double factor = __max(0.1, Vector_dot(&vectorLight, &normal));
+
+    double epsilon = 1e-3;
+    Vector offset = Vector_scale(&normal, epsilon);
+    Point *rayOrigin = Point_traslate(intersectionPoint, &offset);
+    int inShadow = 0;
+    double shadowFactor = 1;
+    if(scene->lightSource->radius > 0){
+        Vector e1 = Vector_perpendicular(&vectorLight);
+        e1 = Vector_normalize(&e1);
+        e1 = Vector_scale(&e1, scene->lightSource->radius * 1.2);
+
+        //check if the intersection point can be in shadow
+        int numCheck = 8;
+        double angle = 2 * M_PI / numCheck;
+        for(int i = 0; i < numCheck; i++){
+            e1 = Vector_rotate(&e1, &vectorLight, angle);
+            if(isInShadow(scene, nearSurface, rayOrigin, Point_traslate(lightPosition, &e1))){
+                inShadow = 1;
+                break;
+            }
+        }
+        e1 = Vector_perpendicular(&vectorLight);
+        e1 = Vector_normalize(&e1);
+        if(inShadow){
+            int occluded = 0;
+            int numSamples = scene->lightSource->radius == 0 ? 1 : SHADOW_SAMPLES;
+            for (int s = 0; s < numSamples; s++) {
+                double theta = ((double)rand() / RAND_MAX) * 2 * M_PI;
+                double r = scene->lightSource->radius * sqrt((double)rand() / RAND_MAX);
+
+                Vector randomTraslation = Vector_rotate(&e1, &vectorLight, theta);
+                randomTraslation = Vector_scale(&randomTraslation, r);
+                
+                Point *randomLightPoint = Point_traslate(lightPosition, &randomTraslation);
+
+                occluded += isInShadow(scene, nearSurface, rayOrigin, randomLightPoint);
+            }
+            shadowFactor = 1.0 - ((double)occluded / numSamples);
+        }
+    }
+    else{
+        shadowFactor = 1 - isInShadow(scene, nearSurface, rayOrigin, lightPosition);
+    }
+
+    shadowFactor = __max(shadowFactor, 0.1);
 
     Color reflectedColor = COLOR_BLACK;
     uint32_t color;
@@ -76,7 +124,7 @@ Color TraceRayR(Scene *scene, Line *l, int depth){
     Vector V = Vector_normalize(&oppositeDirection);
     Vector R;
 
-    double diffuseStrength = __max(0.0, Vector_dot(&N, &L));
+    double diffuseStrength = __max(0.1, Vector_dot(&N, &L));
 
     double NdotL = Vector_dot(&N, &L);
     Vector tempN = N;
@@ -89,8 +137,8 @@ Color TraceRayR(Scene *scene, Line *l, int depth){
     double spec = pow(__max(Vector_dot(&R, &V), 0.0), shininess);
     double specularStrength = nearSurface->smoothness;
     
-    Color diffuseColor = inShadow ? Color_scale(nearSurface->color, 0.1) : Color_scale(nearSurface->color, diffuseStrength);
-    Color specularColor = inShadow ? COLOR_BLACK : Color_scale(COLOR_WHITE, specularStrength * spec);
+    Color diffuseColor = Color_scale(Color_multiply(nearSurface->color, scene->lightSource->color), diffuseStrength * shadowFactor);
+    Color specularColor = Color_scale(COLOR_WHITE, specularStrength * spec * shadowFactor);
     Color lightingColor = Color_add(diffuseColor, specularColor);
     Color finalColor;
 
@@ -103,6 +151,7 @@ Color TraceRayR(Scene *scene, Line *l, int depth){
 
         Line *reflexLine = Line_init(Point_traslate(intersectionPoint, &delta), &reflex);
         reflectedColor = TraceRayR(scene, reflexLine, depth + 1);
+        reflectedColor = Color_scale(reflectedColor, 0.95); //a surface cannot reflect 100% of the light it absorbs
         finalColor = Color_blend(lightingColor, reflectedColor, nearSurface->reflexivity);
     }
     else{
@@ -154,7 +203,7 @@ Point *intersectionPoint(Line *l, Triangle *t){
 }
 
 Point *Sphere_intersection(Surface *sphere, Line *l) {
-    if(sphere->type != SPHERE) return NULL;
+    //if(sphere->type != SPHERE) return NULL;
     Point *O = l->p;           // Ray origin
     Vector *D = l->v;          // Ray direction (not necessarily normalized)
     Point *C = sphere->center; // Sphere center
@@ -196,7 +245,7 @@ Point *Sphere_intersection(Surface *sphere, Line *l) {
 
 Point *Surface_intersection(Surface *surface, Line *l, Triangle **p_t){
     *p_t = NULL;
-    if(surface->type == SPHERE){
+    if(surface->type == SPHERE || surface->type == LIGHT){
         return Sphere_intersection(surface, l);
     }
     double d = Point_distance(l->p, surface->center);

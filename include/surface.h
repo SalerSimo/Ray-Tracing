@@ -13,7 +13,7 @@ typedef struct{
 }Triangle;
 
 typedef enum{
-    GENERIC, SPHERE
+    GENERIC, SPHERE, LIGHT
 }SurfaceType;
 
 /**

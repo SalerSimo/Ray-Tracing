@@ -46,6 +46,8 @@ Vector  Vector_scale(Vector *v, double scalar);
 Vector  Vector_sum(Vector *v1, Vector *v2);
 Vector  Vector_crossProduct(Vector *a, Vector *b);
 double  Vector_dot(Vector *v1, Vector *v2);
+Vector  Vector_perpendicular(Vector *v);
+Vector  Vector_rotate(Vector *v, Vector *axis, double angle);
 
 // Debug
 void    Vector_print(Vector *v);

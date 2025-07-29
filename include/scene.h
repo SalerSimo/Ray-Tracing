@@ -7,6 +7,12 @@
 #include"geometry.h"
 #include"surface.h"
 
+typedef struct{
+    Point *position;
+    double radius;
+    Color color;
+}Light;
+
 /**
  * Represents a 3D scene for ray tracing.
  *
@@ -28,8 +34,8 @@ typedef struct{
     Surface **surfaces;
     /** Number of surfaces in the scene. */
     unsigned int numSurfaces;
-    /** Pointer to the position of the light source of the scene. */
-    Point *lightSource;
+    /** Pointer to the light source of the scene. */
+    Light *lightSource;
 }Scene;
 
 
@@ -49,6 +55,9 @@ Scene *Scene_init();
  * @param surfaces Array of pointers to the surfaces to include in the scene.
  * @param numSurfaces Number of surfaces in the array.
  */
-void Scene_fill(Scene *s, Point *lightSource, Surface **surfaces, int numSurfaces);
+void Scene_fill(Scene *s, Light *lightSource, Surface **surfaces, int numSurfaces);
+
+
+Light *Light_new(Point *position, double radius, Color lightColor);
 
 #endif //SCENE_H
