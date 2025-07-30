@@ -8,7 +8,7 @@
 #define COLOR_RED Color_new(0xff0000)
 #define COLOR_GREEN Color_new(0x00ff00)
 #define COLOR_BLUE Color_new(0x0000ff)
-#define COlOR_YELLOW Color_new(0xffff00)
+#define COLOR_YELLOW Color_new(0xffff00)
 
 typedef struct{
     uint32_t color;
