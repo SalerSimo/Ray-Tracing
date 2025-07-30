@@ -164,11 +164,15 @@ void SimulateScene(Scene *scene, SDL_Window *window){
             else if(event.type == SDL_EVENT_MOUSE_BUTTON_DOWN){
                 double angleStep = 10;
                 angleStep = angleStep * M_PI / 180;
-                if(event.button.button == SDL_BUTTON_RIGHT){
-                    angleStep = -angleStep;
-                }
-                else if(event.button.button != SDL_BUTTON_LEFT){
-                    continue;
+
+                switch(event.button.button){
+                    case SDL_BUTTON_LEFT:
+                        break;
+                    case SDL_BUTTON_RIGHT:
+                        angleStep *= -1;
+                        break;
+                    default:
+                        continue;
                 }
 
                 for(int i = 0; i < numFrame; i++){
