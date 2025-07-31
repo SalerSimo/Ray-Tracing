@@ -3,7 +3,7 @@
 #include<math.h>
 #include"raytracer.h"
 
-#define SHADOW_SAMPLES 50
+#define SHADOW_SAMPLES 20
 
 
 Point *Surface_intersection(Surface *surface, Line *l, Triangle **p_t);
