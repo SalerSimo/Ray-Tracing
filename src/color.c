@@ -7,6 +7,21 @@ Color Color_new(uint32_t color){
     return c;
 }
 
+Color Color_fromRGB(double r, double g, double b){
+    Color c;
+
+    int red   = (int)(r * 255.0 + 0.5);
+    int green = (int)(g * 255.0 + 0.5);
+    int blue  = (int)(b * 255.0 + 0.5);
+
+    if (red   < 0) red = 0;   else if (red > 255) red = 255;
+    if (green < 0) green = 0; else if (green > 255) green = 255;
+    if (blue  < 0) blue = 0;  else if (blue > 255) blue = 255;
+
+    c.color = ((uint32_t)red << 16) | ((uint32_t)green << 8) | (uint32_t)blue;
+    return c;
+}
+
 Color Color_scale(Color c, double factor){
     if(factor <= 0)
         return COLOR_BLACK;

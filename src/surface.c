@@ -4,11 +4,12 @@
 #include<stdint.h>
 #include"surface.h"
 
-Triangle *Triangle_init(Point *a, Point *b, Point *c){
+Triangle *Triangle_init(Point *a, Point *b, Point *c, Color color){
     Triangle *t = malloc(sizeof(Triangle));
     t->a = a;
     t->b = b;
     t->c = c;
+    t->color = color;
     return t;
 }
 
@@ -78,14 +79,16 @@ Surface *Surface_createSphere(Point *center, double radius, double reflexivity, 
             sphere->triangles[t++] = Triangle_init(
                 points[curr],
                 points[next],
-                points[next_right]
+                points[next_right],
+                color
             );
 
             // Triangle 2
             sphere->triangles[t++] = Triangle_init(
                 points[curr],
                 points[next_right],
-                points[curr_right]
+                points[curr_right],
+                color
             );
         }
     }
@@ -128,8 +131,8 @@ Surface *Surface_createRectXY(Point *origin, double width, double height, double
     rect->numTriangles = 2;
 
     rect->triangles = malloc(rect->numTriangles *sizeof(Triangle*));
-    rect->triangles[0] = Triangle_init(origin, p1, p2);
-    rect->triangles[1] = Triangle_init(p1, p2, p3);
+    rect->triangles[0] = Triangle_init(origin, p1, p2, color);
+    rect->triangles[1] = Triangle_init(p1, p2, p3, color);
 
     rect->color = color;
     rect->reflexivity = reflexivity;
@@ -159,8 +162,8 @@ Surface *Surface_createRectXZ(Point *origin, double width, double height, double
     rect->numTriangles = 2;
 
     rect->triangles = malloc(rect->numTriangles *sizeof(Triangle*));
-    rect->triangles[0] = Triangle_init(origin, p2, p1);
-    rect->triangles[1] = Triangle_init(p1, p2, p3);
+    rect->triangles[0] = Triangle_init(origin, p2, p1, color);
+    rect->triangles[1] = Triangle_init(p1, p2, p3, color);
 
     rect->color = color;
     rect->reflexivity = reflexivity;
@@ -190,8 +193,8 @@ Surface *Surface_createRectYZ(Point *origin, double width, double height, double
     rect->numTriangles = 2;
 
     rect->triangles = malloc(rect->numTriangles *sizeof(Triangle*));
-    rect->triangles[0] = Triangle_init(origin, p1, p2);
-    rect->triangles[1] = Triangle_init(p1, p2, p3);
+    rect->triangles[0] = Triangle_init(origin, p1, p2, color);
+    rect->triangles[1] = Triangle_init(p1, p2, p3, color);
 
     rect->color = color;
     rect->reflexivity = reflexivity;
@@ -237,11 +240,24 @@ Surface *Surface_createBox(Point *origin, double width, double height, double de
 
     for (int i = 0; i < 12; ++i) {
         int *f = faces[i];
-        box->triangles[i] = Triangle_init(points[f[0]], points[f[1]], points[f[2]]);
+        box->triangles[i] = Triangle_init(points[f[0]], points[f[1]], points[f[2]], color);
     }
 
     box->color = color;
     box->reflexivity = reflexivity;
     box->smoothness = smoothness;
     return box;
+}
+
+void Triangle_translate(Triangle *t, Vector *translation){
+    t->a = Point_translate(t->a, translation);
+    t->b = Point_translate(t->b, translation);
+    t->c = Point_translate(t->c, translation);
+}
+
+void Surface_translate(Surface *surface, Vector *translation){
+    surface->center = Point_translate(surface->center, translation);
+    for(int i = 0; i < surface->numTriangles; i++){
+        Triangle_translate(surface->triangles[i], translation);
+    }
 }

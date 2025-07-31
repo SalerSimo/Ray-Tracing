@@ -10,6 +10,7 @@
 
 typedef struct{
     Point *a, *b, *c;
+    Color color;
 }Triangle;
 
 typedef enum{
@@ -117,6 +118,14 @@ Surface *Surface_createBox(Point *origin, double width, double height, double de
  *         or NULL if allocation fails.
  */
 Surface *Surface_createSphere(Point *center, double radius, double reflexivity, double smoothness, Color color);
+
+/**
+ * @brief Translates all vertices of the Surface by a given vector.
+ * 
+ * @param surface Pointer to the Surface to translate.
+ * @param translation Pointer to the Vector representing the translation offset.
+ */
+void Surface_translate(Surface *surface, Vector *translation);
 
 /**
  * Computes and returns the surface normal of a triangle.

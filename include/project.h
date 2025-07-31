@@ -6,5 +6,6 @@
 #include"color.h"
 #include"raytracer.h"
 #include"scene.h"
+#include"objloader.h"
 
 #endif

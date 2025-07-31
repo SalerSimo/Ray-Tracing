@@ -23,6 +23,17 @@ typedef struct{
 Color Color_new(uint32_t color);
 
 /**
+ * @brief Create a new Color instance from RGB components.
+ * 
+ * @param r The red component, in the range [0, 1].
+ * @param g The green component, in the range [0, 1].
+ * @param b The blue component, in the range [0, 1].
+ * 
+ * @return A Color struct initialized with the specified color.
+ */
+Color Color_fromRGB(double r, double g, double b);
+
+/**
  * Scales the brightness of a Color by a given factor.
  *
  * @param c The original Color to scale.
