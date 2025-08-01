@@ -1,6 +1,7 @@
 #include"objloader.h"
 #include<string.h>
 #include<stdlib.h>
+#include<math.h>
 
 #define LINE_MAX_LEN 256
 
@@ -158,7 +159,7 @@ Surface* Surface_fromOBJ(const char *fileName) {
 
     double maxDist = 0;
     for (int i = 0; i < pointCount; i++) {
-        double d = Point_distance(center, points[i]);
+        double d = Point_distanceSquared(center, points[i]);
         if (d > maxDist) maxDist = d;
     }
 
@@ -166,7 +167,7 @@ Surface* Surface_fromOBJ(const char *fileName) {
     surface->numTriangles = triCount;
     surface->triangles = triangles;
     surface->center = center;
-    surface->maxDistanceFromCenter = maxDist;
+    surface->maxDistanceFromCenter = sqrt(maxDist);
     surface->color = COLOR_WHITE;
     surface->reflexivity = 0.0;
     surface->smoothness = 0.0;

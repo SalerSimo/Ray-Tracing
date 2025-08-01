@@ -8,7 +8,7 @@ Vector Vector_init(double x, double y, double z){
     v.x = x;
     v.y = y;
     v.z = z;
-    v.norm = sqrt(pow(x, 2) + pow(y, 2) + pow(z, 2));
+    v.normSquared = x*x + y*y + z*z;
     return v;
 }
 
@@ -21,11 +21,11 @@ void Vector_print(Vector *v){
 
 Vector Vector_normalize(Vector *v){
     Vector vNorm = Vector_init(v->x, v->y, v->z);
-    double norm = vNorm.norm;
+    double norm = sqrt(vNorm.normSquared);
     vNorm.x /= norm;
     vNorm.y /= norm;
     vNorm.z /= norm;
-    vNorm.norm = 1;
+    vNorm.normSquared = 1;
     return vNorm;
 }
 
@@ -66,8 +66,8 @@ void Point_print(Point *p){
     printf("(%f, %f, %f)\n", p->x, p->y, p->z);
 }
 
-double Point_distance(Point *a, Point *b){
-    return sqrt(pow(a->x - b->x, 2) + pow(a->y - b->y, 2) + pow(a->z - b->z, 2));
+double Point_distanceSquared(Point *a, Point *b){
+    return pow(a->x - b->x, 2) + pow(a->y - b->y, 2) + pow(a->z - b->z, 2);
 }
 
 Line *Line_init(Point *p, Vector *v){
@@ -90,15 +90,9 @@ double Line_Point_distance(Line *l, Point *p){
     Vector v =  Vector_crossProduct(l->v, &p0p1);
     Vector n = Vector_crossProduct(l->v, &v);
 
-    double distance = abs(Vector_dot(&p0p1, &n)) / n.norm;
+    double distance = abs(Vector_dot(&p0p1, &n)) / sqrt(n.normSquared);
     return distance;
 }
-
-
-double Vector_angle(Vector *v1, Vector *v2){
-    return acos(Vector_dot(v1, v2) / (v1->norm * v2->norm)) * 180 / M_PI;
-}
-
 
 Plane *Plane_new(double A, double B, double C, double D){
     Plane *plane = malloc(sizeof(Plane));
@@ -114,7 +108,7 @@ Vector Plane_vectorNormal(Plane *plane){
 
 Point *Line_projectionPoint(Line *l, Point *p){
     Vector v = Vector_fromPoints(l->p, p);
-    double scale = Vector_dot(&v, l->v) / pow(l->v->norm, 2);
+    double scale = Vector_dot(&v, l->v) / l->v->normSquared;
     return Point_init(
         l->p->x + scale*l->v->x,
         l->p->y + scale*l->v->y,

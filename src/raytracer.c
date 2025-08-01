@@ -21,8 +21,8 @@ int isInShadow(Scene *scene, Surface *nearSurface, Point *intersectionPoint, Poi
         Triangle *t;
         Point *p = Surface_intersection(scene->surfaces[i], shadowRay, &t);
         if (p != NULL) {
-            double distToObj = Point_distance(p, intersectionPoint);
-            double distToLight = Point_distance(lightPoint, intersectionPoint);
+            double distToObj = Point_distanceSquared(p, intersectionPoint);
+            double distToLight = Point_distanceSquared(lightPoint, intersectionPoint);
             if (distToObj < distToLight - 1e-5) {
                 return 1;
             }
@@ -43,7 +43,7 @@ Color TraceRayR(Scene *scene, Line *l, int depth){
         if(scene->surfaces[i] == NULL) continue;
         Point *p = Surface_intersection(scene->surfaces[i], l, &t);
         if(p != NULL){
-            double distance = Point_distance(l->p, p);
+            double distance = Point_distanceSquared(l->p, p);
             if(minDistance == -1 || distance < minDistance){
                 nearSurface = scene->surfaces[i];
                 intersectionPoint = p;
@@ -249,7 +249,6 @@ Point *Surface_intersection(Surface *surface, Line *l, Triangle **p_t){
         *p_t = surface->triangles[0];
         return Sphere_intersection(surface, l);
     }
-    double d = Point_distance(l->p, surface->center);
     double linePointDistance = Line_Point_distance(l, surface->center);
     if(linePointDistance > surface->maxDistanceFromCenter){
         return NULL;
@@ -266,7 +265,7 @@ Point *Surface_intersection(Surface *surface, Line *l, Triangle **p_t){
     for(int i = 0; i < surface->numTriangles; i++){
         Point *p = intersectionPoint(l, surface->triangles[i]);
         if(p != NULL){
-            double distance = Point_distance(l->p, p);
+            double distance = Point_distanceSquared(l->p, p);
             if(minDistance == -1 || distance < minDistance){
                 intersection = p;
                 *p_t = surface->triangles[i];

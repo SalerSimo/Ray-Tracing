@@ -18,7 +18,7 @@ double Triangle_area(Triangle *t){
     ab = Vector_fromPoints(t->a, t->b);
     ac = Vector_fromPoints(t->a, t->c);
     Vector v = Vector_crossProduct(&ab, &ac);
-    return v.norm / 2;
+    return sqrt(v.normSquared) / 2;
 }
 
 Vector Triangle_getNormal(Triangle *t){

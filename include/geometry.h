@@ -3,7 +3,7 @@
 
 typedef struct{
     double x, y, z;
-    double norm;
+    double normSquared;
 }Vector;
 
 typedef struct{
@@ -26,7 +26,7 @@ typedef struct{
 Point*  Point_init(double x, double y, double z);
 
 // Operations
-double  Point_distance(Point *a, Point *b);
+double  Point_distanceSquared(Point *a, Point *b);
 Point*  Point_translate(Point *p, Vector *v);
 
 // Debug
@@ -40,7 +40,6 @@ Vector  Vector_init(double x, double y, double z);
 Vector  Vector_fromPoints(Point *a, Point *b);
 
 // Operations
-double  Vector_angle(Vector *v1, Vector *v2);
 Vector  Vector_normalize(Vector *v);
 Vector  Vector_scale(Vector *v, double scalar);
 Vector  Vector_sum(Vector *v1, Vector *v2);
