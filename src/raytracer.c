@@ -115,9 +115,6 @@ Color TraceRayR(Scene *scene, Line *l, int depth){
 
     shadowFactor = __max(shadowFactor, 0.1);
 
-    Color reflectedColor = COLOR_BLACK;
-    uint32_t color;
-
     Vector N = normal;
     Vector L = vectorLight;
     Vector oppositeDirection = Vector_scale(l->v, -1);
@@ -139,8 +136,6 @@ Color TraceRayR(Scene *scene, Line *l, int depth){
     
     Color diffuseColor = Color_scale(Color_multiply(intersectionTriangle->color, scene->lightSource->color), diffuseStrength * shadowFactor);
     Color specularColor = Color_scale(COLOR_WHITE, specularStrength * spec * shadowFactor);
-    Color lightingColor = Color_add(diffuseColor, specularColor);
-    Color finalColor;
 
     if (nearSurface->reflexivity > 0 && depth < MAX_DEPTH) {
         Vector dir = Vector_normalize(l->v);
@@ -150,13 +145,11 @@ Color TraceRayR(Scene *scene, Line *l, int depth){
         Vector delta = Vector_scale(&normal, epsilon);
 
         Line *reflexLine = Line_init(Point_translate(intersectionPoint, &delta), &reflex);
-        reflectedColor = TraceRayR(scene, reflexLine, depth + 1);
+        Color reflectedColor = TraceRayR(scene, reflexLine, depth + 1);
         reflectedColor = Color_scale(reflectedColor, 0.95); // a surface cannot reflect 100% of the light it absorbs
-        finalColor = Color_blend(lightingColor, reflectedColor, nearSurface->reflexivity);
+        diffuseColor = Color_blend(diffuseColor, reflectedColor, nearSurface->reflexivity);
     }
-    else{
-        finalColor = lightingColor;
-    }
+    Color finalColor = Color_add(diffuseColor, specularColor);
     return finalColor;
 }
 
