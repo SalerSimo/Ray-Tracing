@@ -22,8 +22,11 @@ typedef struct{
 typedef struct{
     /** Pointer to the camera position. */
     Point *camera;
-    /** Distance between the camera and the view plane.*/
-    double cameraDistance;
+    /**
+     * Field of view (FOV) in radians.
+     * Defines the horizontal angle of the camera's viewing frustum.
+     */
+    double fieldOfView;
     /** 
      *  Rotational angle in radians around the Y-axis, applied to the camera.
      *  An angle of 0 means the camera is facing the negative Z-axis.
@@ -40,12 +43,17 @@ typedef struct{
 
 
 /**
- * Creates an empty scene.
+ * @brief Creates an empty scene.
  * 
- * It sets all pointers to NULL and all numeric values to 0.
+ * It sets the camera and the field of view (FOV), if the passed FOV is invalid, the FOV of the scene is set to 90°.
+ * It also sets all other pointers to NULL and all numeric values to 0.
+ * 
+ * @param camera Pointer to the camera position.
+ * @param fieldOfView Field of view in radians.
+ * 
  * @return Pointer to the allocated scene or NULL if allocation fails.
  */
-Scene *Scene_init();
+Scene *Scene_init(Point *camera, double fieldOfView);
 
 /**
  * Initializes a scene with the given light source and surfaces.

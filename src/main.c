@@ -29,11 +29,13 @@ Color GetPixelColor(double i, double j, ThreadData *data){
     Scene *scene = data->scene;
     Point *camera = scene->camera;
     SDL_Surface *surface = data->surface;
-    double distance = scene->cameraDistance;
+    double distance = 1;
     int factor = data->antiAliasingFactor;
-    double aspectRatio = (double)surface->w / surface->h;
-    double viewportHeight = 3;
-    double viewportWidth = viewportHeight * aspectRatio;
+    double aspectRatio = (double)surface->h / surface->w;
+
+    double fieldOfView = scene->fieldOfView;
+    double viewportWidth = 2 * distance * tan(fieldOfView / 2);
+    double viewportHeight = viewportWidth * aspectRatio;
 
     int width = surface->w*factor;
     int height = surface->h*factor;
@@ -117,8 +119,8 @@ void *thread_function(void *args){
 Scene *createScene(){
     Point *camera = Point_init(0, 0, 0);
 
-    Scene *scene = Scene_init();
-    scene->cameraDistance = 1;
+    double fieldOfView = 120 * M_PI / 180;
+    Scene *scene = Scene_init(camera, fieldOfView);
 
     Surface *sphere1 = Surface_createSphere(Point_init(15, 0, -20), 7.5, 1, 0.5, COLOR_RED);
     Surface *sphere2 = Surface_createSphere(Point_init(-15, 0, -20), 7.5, 0.2, 0.5, COLOR_BLUE);
@@ -143,7 +145,6 @@ Scene *createScene(){
 
     Light *lightSource = Light_new(Point_init(15, 10, -10), 1, COLOR_WHITE);
     Scene_fill(scene, lightSource, list, n);
-    scene->camera = camera;
 }
 
 void SimulateScene(Scene *scene, SDL_Window *window){
