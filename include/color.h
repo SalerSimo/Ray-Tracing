@@ -3,12 +3,20 @@
 
 #include<stdint.h>
 
-#define COLOR_WHITE Color_new(0xffffff)
-#define COLOR_BLACK Color_new(0x000000)
-#define COLOR_RED Color_new(0xff0000)
-#define COLOR_GREEN Color_new(0x00ff00)
-#define COLOR_BLUE Color_new(0x0000ff)
-#define COLOR_YELLOW Color_new(0xffff00)
+#define COLOR_BLACK    Color_new(0x000000)
+#define COLOR_WHITE    Color_new(0xFFFFFF)
+#define COLOR_RED      Color_new(0xFF0000)
+#define COLOR_GREEN    Color_new(0x008000)
+#define COLOR_BLUE     Color_new(0x0000FF)
+#define COLOR_YELLOW   Color_new(0xFFFF00)
+#define COLOR_CYAN     Color_new(0x00FFFF)
+#define COLOR_MAGENTA  Color_new(0xFF00FF)
+#define COLOR_GRAY     Color_new(0x808080)
+#define COLOR_ORANGE   Color_new(0xFFA500)
+#define COLOR_PURPLE   Color_new(0x800080)
+#define COLOR_BROWN    Color_new(0xA52A2A)
+#define COLOR_PINK     Color_new(0xFFC0CB)
+#define COLOR_LIME     Color_new(0x00FF00)
 
 typedef struct{
     uint32_t color;
