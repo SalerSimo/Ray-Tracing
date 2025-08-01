@@ -149,7 +149,6 @@ Scene *createScene(){
 
 void SimulateScene(Scene *scene, SDL_Window *window){
     int nThread = 12;
-    int antiAliasingFactor = 1;
     Display(scene, window, nThread, 1, antiAliasingFactor);
 
     SDL_Event event;
@@ -244,7 +243,7 @@ int main() {
     if(window == NULL) return 1;
 
     Scene *scene = createScene();
-    SimulateScene(scene, window);
+    SimulateScene(scene, window, 2);
 }
 
 void Display(Scene *scene, SDL_Window *window, int nThread, bool verbose, int antiAliasingFactor){
