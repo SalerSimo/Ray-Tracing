@@ -26,6 +26,22 @@ void Scene_fill(Scene *s, Light *lightSource, Surface **surfaces, int numSurface
     s->surfaces[numSurfaces]->type = LIGHT;
 }
 
+void Scene_addSurfaces(Scene *s, Surface **surfaces, int numSurfaces){
+    int totSurfaces = s->numSurfaces + numSurfaces;
+    Surface **newSurfaces = malloc(totSurfaces * sizeof(Surface*));
+
+    for(int i = 0; i < s->numSurfaces; i++){
+        newSurfaces[i] = s->surfaces[i];
+    }
+    for(int i = 0; i < numSurfaces; i++){
+        newSurfaces[i + s->numSurfaces] = surfaces[i];
+    }
+
+    free(s->surfaces);
+    s->numSurfaces = totSurfaces;
+    s->surfaces = newSurfaces;
+}
+
 Light *Light_new(Point *position, double radius, Color lightColor){
     Light *light = malloc(sizeof(Light));
     light->position = position;

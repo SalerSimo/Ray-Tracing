@@ -58,6 +58,19 @@ Scene *Scene_init();
 void Scene_fill(Scene *s, Light *lightSource, Surface **surfaces, int numSurfaces);
 
 
+/**
+ * @brief Adds multiple surfaces to the scene.
+ *
+ *
+ * @param s Pointer to the Scene object to which surfaces will be added.
+ * @param surfaces Array of pointers to Surface objects to be added.
+ * @param numSurfaces Number of Surfaces in the array.
+ *
+ * @warning This function does not prevent duplicate Surface pointers from being added.
+ */
+void Scene_addSurfaces(Scene *s, Surface **surfaces, int numSurfaces);
+
+
 Light *Light_new(Point *position, double radius, Color lightColor);
 
 #endif //SCENE_H
