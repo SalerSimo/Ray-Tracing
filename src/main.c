@@ -183,27 +183,38 @@ void SimulateScene(Scene *scene, SDL_Window *window){
             else if(event.type == SDL_EVENT_KEY_DOWN){
                 SDL_Keycode key = event.key.key;
                 double moveStep = 4;
-                double deltaX = 0, deltaZ = 0;
+                double deltaX = 0, deltaZ = 0, deltaY = 0;
                 double angle = scene->rotationAngle;
-                if(key == SDLK_W){
-                    deltaZ = -moveStep*cos(angle);
-                    deltaX = -moveStep*sin(angle);
-                }
-                else if(key == SDLK_S){
-                    deltaZ = moveStep*cos(angle);
-                    deltaX = moveStep*sin(angle);
-                }
-                else if(key == SDLK_D){
-                    deltaZ = -moveStep*sin(angle);
-                    deltaX = moveStep*cos(angle);
-                }
-                else if(key == SDLK_A){
-                    deltaZ = moveStep*sin(angle);
-                    deltaX = -moveStep*cos(angle);
+                switch(key){
+                    case SDLK_W:
+                        deltaZ = -moveStep*cos(angle);
+                        deltaX = -moveStep*sin(angle);
+                        break;
+                    case SDLK_S:
+                        deltaZ = moveStep*cos(angle);
+                        deltaX = moveStep*sin(angle);
+                        break;
+                    case SDLK_D:
+                        deltaZ = -moveStep*sin(angle);
+                        deltaX = moveStep*cos(angle);
+                        break;
+                    case SDLK_A:
+                        deltaZ = moveStep*sin(angle);
+                        deltaX = -moveStep*cos(angle);
+                        break;
+                    case SDLK_UP:
+                        deltaY = 2;
+                        break;
+                    case SDLK_DOWN:
+                        deltaY = -2;
+                        break;
+                    default:
+                        break;
                 }
                 for(int i = 0; i < numFrame; i++){
                     scene->camera->x += deltaX / numFrame;
                     scene->camera->z += deltaZ / numFrame;
+                    scene->camera->y += deltaY / numFrame;
                     Display(scene, window, nThread, 0, antiAliasingFactor);
                 }
             }
