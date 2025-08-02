@@ -17,7 +17,7 @@ double Triangle_area(Triangle *t){
     Vector ab, ac;
     ab = Vector_fromPoints(t->a, t->b);
     ac = Vector_fromPoints(t->a, t->c);
-    Vector v = Vector_crossProduct(&ab, &ac);
+    Vector v = Vector_crossProduct(ab, ac);
     return sqrt(v.normSquared) / 2;
 }
 
@@ -25,8 +25,8 @@ Vector Triangle_getNormal(Triangle *t){
     Vector ab, ac;
     ab = Vector_fromPoints(t->a, t->b);
     ac = Vector_fromPoints(t->a, t->c);
-    Vector normal = Vector_crossProduct(&ab, &ac);
-    return Vector_normalize(&normal);
+    Vector normal = Vector_crossProduct(ab, ac);
+    return Vector_normalize(normal);
 }
 
 Surface *Surface_new(){
@@ -271,19 +271,19 @@ void Surface_scale(Surface *surface, double scalar){
         Triangle *t = surface->triangles[i];
 
         v = Vector_fromPoints(surface->center, t->a);
-        v = Vector_scale(&v, scalar);
+        v = Vector_scale(v, scalar);
         t->a->x = surface->center->x + v.x;
         t->a->y = surface->center->y + v.y;
         t->a->z = surface->center->z + v.z;
 
         v = Vector_fromPoints(surface->center, t->b);
-        v = Vector_scale(&v, scalar);
+        v = Vector_scale(v, scalar);
         t->b->x = surface->center->x + v.x;
         t->b->y = surface->center->y + v.y;
         t->b->z = surface->center->z + v.z;
 
         v = Vector_fromPoints(surface->center, t->c);
-        v = Vector_scale(&v, scalar);
+        v = Vector_scale(v, scalar);
         t->c->x = surface->center->x + v.x;
         t->c->y = surface->center->y + v.y;
         t->c->z = surface->center->z + v.z;

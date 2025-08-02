@@ -56,7 +56,7 @@ Color TraceRayR(Scene *scene, Line *l, int depth){
     if (nearSurface->type == LIGHT) return intersectionTriangle->color;
 
     Vector vectorLight = Vector_fromPoints(intersectionPoint, lightPosition);
-    vectorLight = Vector_normalize(&vectorLight);
+    vectorLight = Vector_normalize(vectorLight);
 
     Vector normal;
     if(nearSurface->type == SPHERE){
@@ -65,33 +65,31 @@ Color TraceRayR(Scene *scene, Line *l, int depth){
     else{
         normal = Triangle_getNormal(intersectionTriangle);
     }
-    normal = Vector_normalize(&normal);
-    if(Vector_dot(&normal, l->v) > 0){
-        normal = Vector_scale(&normal, -1);
+    normal = Vector_normalize(normal);
+    if(Vector_dot(normal, *l->v) > 0){
+        normal = Vector_scale(normal, -1);
     }
 
     double epsilon = 1e-3;
-    Vector offset = Vector_scale(&normal, epsilon);
+    Vector offset = Vector_scale(normal, epsilon);
     Point *rayOrigin = Point_translate(intersectionPoint, &offset);
     int inShadow = 0;
     double shadowFactor = 1;
     if(scene->lightSource->radius > 0){
-        Vector e1 = Vector_perpendicular(&vectorLight);
-        e1 = Vector_normalize(&e1);
-        e1 = Vector_scale(&e1, scene->lightSource->radius * 1.2);
+        Vector e1 = Vector_normalize(Vector_perpendicular(vectorLight));
+        e1 = Vector_scale(e1, scene->lightSource->radius * 1.2);
 
         //check if the intersection point can be in shadow
         int numCheck = 8;
         double angle = 2 * M_PI / numCheck;
         for(int i = 0; i < numCheck; i++){
-            e1 = Vector_rotate(&e1, &vectorLight, angle);
+            e1 = Vector_rotate(e1, vectorLight, angle);
             if(isInShadow(scene, nearSurface, rayOrigin, Point_translate(lightPosition, &e1))){
                 inShadow = 1;
                 break;
             }
         }
-        e1 = Vector_perpendicular(&vectorLight);
-        e1 = Vector_normalize(&e1);
+        e1 = Vector_normalize(Vector_perpendicular(vectorLight));
         if(inShadow){
             int occluded = 0;
             int numSamples = scene->lightSource->radius == 0 ? 1 : SHADOW_SAMPLES;
@@ -99,8 +97,8 @@ Color TraceRayR(Scene *scene, Line *l, int depth){
                 double theta = ((double)rand() / RAND_MAX) * 2 * M_PI;
                 double r = scene->lightSource->radius * sqrt((double)rand() / RAND_MAX);
 
-                Vector randomTraslation = Vector_rotate(&e1, &vectorLight, theta);
-                randomTraslation = Vector_scale(&randomTraslation, r);
+                Vector randomTraslation = Vector_rotate(e1, vectorLight, theta);
+                randomTraslation = Vector_scale(randomTraslation, r);
                 
                 Point *randomLightPoint = Point_translate(lightPosition, &randomTraslation);
 
@@ -117,32 +115,32 @@ Color TraceRayR(Scene *scene, Line *l, int depth){
 
     Vector N = normal;
     Vector L = vectorLight;
-    Vector oppositeDirection = Vector_scale(l->v, -1);
-    Vector V = Vector_normalize(&oppositeDirection);
+    Vector oppositeDirection = Vector_scale(*l->v, -1);
+    Vector V = Vector_normalize(oppositeDirection);
     Vector R;
 
-    double diffuseStrength = __max(0.1, Vector_dot(&N, &L));
+    double diffuseStrength = __max(0.1, Vector_dot(N, L));
 
-    double NdotL = Vector_dot(&N, &L);
+    double NdotL = Vector_dot(N, L);
     Vector tempN = N;
-    tempN = Vector_scale(&tempN, 2 * NdotL);
-    L = Vector_scale(&L, -1);
-    R = Vector_sum(&tempN, &L);
-    R = Vector_normalize(&R);
+    tempN = Vector_scale(tempN, 2 * NdotL);
+    L = Vector_scale(L, -1);
+    R = Vector_sum(tempN, L);
+    R = Vector_normalize(R);
 
     int shininess = 32;
-    double spec = pow(__max(Vector_dot(&R, &V), 0.0), shininess);
+    double spec = pow(__max(Vector_dot(R, V), 0.0), shininess);
     double specularStrength = nearSurface->smoothness;
     
     Color diffuseColor = Color_scale(Color_multiply(intersectionTriangle->color, scene->lightSource->color), diffuseStrength * shadowFactor);
     Color specularColor = Color_scale(COLOR_WHITE, specularStrength * spec * shadowFactor);
 
     if (nearSurface->reflexivity > 0 && depth < MAX_DEPTH) {
-        Vector dir = Vector_normalize(l->v);
-        Vector tang = Vector_scale(&normal, -2 * Vector_dot(&normal, &dir));
-        Vector reflex = Vector_sum(&dir, &tang);
+        Vector dir = Vector_normalize(*l->v);
+        Vector tang = Vector_scale(normal, -2 * Vector_dot(normal, dir));
+        Vector reflex = Vector_sum(dir, tang);
         double epsilon = 1e-5;
-        Vector delta = Vector_scale(&normal, epsilon);
+        Vector delta = Vector_scale(normal, epsilon);
 
         Line *reflexLine = Line_init(Point_translate(intersectionPoint, &delta), &reflex);
         Color reflectedColor = TraceRayR(scene, reflexLine, depth + 1);
@@ -162,25 +160,25 @@ Point *intersectionPoint(Line *l, Triangle *t){
     Vector e1 = Vector_fromPoints(A, B);
     Vector e2 = Vector_fromPoints(A, C);
 
-    Vector h = Vector_crossProduct(l->v, &e2);
-    double a = Vector_dot(&e1, &h);
+    Vector h = Vector_crossProduct(*l->v, e2);
+    double a = Vector_dot(e1, h);
     if (fabs(a) < EPSILON) {
         return NULL;
     }
 
     Vector s = Vector_fromPoints(A, l->p);
-    double u = Vector_dot(&s, &h) / a;
+    double u = Vector_dot(s, h) / a;
     if (u < 0.0 || u > 1.0) {
         return NULL;
     }
 
-    Vector q = Vector_crossProduct(&s, &e1);
-    double v = Vector_dot(l->v, &q) / a;
+    Vector q = Vector_crossProduct(s, e1);
+    double v = Vector_dot(*l->v, q) / a;
     if (v < 0.0 || u + v > 1.0) {
         return NULL;
     }
 
-    double ti = Vector_dot(&e2, &q) / a;
+    double ti = Vector_dot(e2, q) / a;
     //if intersection is in the opposite direction of the line exclude it
     if (ti < 1e-6) return NULL;
 
@@ -198,7 +196,7 @@ Point *intersectionPoint(Line *l, Triangle *t){
 Point *Sphere_intersection(Surface *sphere, Line *l) {
     //if(sphere->type != SPHERE) return NULL;
     Point *O = l->p;           // Ray origin
-    Vector *D = l->v;          // Ray direction (not necessarily normalized)
+    Vector D = *l->v;          // Ray direction (not necessarily normalized)
     Point *C = sphere->center; // Sphere center
     double r = sphere->maxDistanceFromCenter;
 
@@ -207,8 +205,8 @@ Point *Sphere_intersection(Surface *sphere, Line *l) {
 
     // Compute a, b, c
     double a = Vector_dot(D, D);
-    double b = 2 * Vector_dot(&L, D);
-    double c = Vector_dot(&L, &L) - r * r;
+    double b = 2 * Vector_dot(L, D);
+    double c = Vector_dot(L, L) - r * r;
 
     double discriminant = b * b - 4 * a * c;
 
@@ -228,9 +226,9 @@ Point *Sphere_intersection(Surface *sphere, Line *l) {
 
     // Compute intersection point: P = O + t * D
     Point *intersection = Point_init(
-        O->x + t * D->x,
-        O->y + t * D->y,
-        O->z + t * D->z
+        O->x + t * D.x,
+        O->y + t * D.y,
+        O->z + t * D.z
     );
 
     return intersection;
@@ -249,7 +247,7 @@ Point *Surface_intersection(Surface *surface, Line *l, Triangle **p_t){
 
     Point *q = Line_projectionPoint(l, surface->center);
     Vector pq = Vector_fromPoints(l->p, q);
-    if(Vector_dot(&pq, l->v) + surface->maxDistanceFromCenter < 0){
+    if(Vector_dot(pq, *l->v) + surface->maxDistanceFromCenter < 0){
         return NULL;
     }
 

@@ -40,13 +40,14 @@ Vector  Vector_init(double x, double y, double z);
 Vector  Vector_fromPoints(Point *a, Point *b);
 
 // Operations
-Vector  Vector_normalize(Vector *v);
-Vector  Vector_scale(Vector *v, double scalar);
-Vector  Vector_sum(Vector *v1, Vector *v2);
-Vector  Vector_crossProduct(Vector *a, Vector *b);
-double  Vector_dot(Vector *v1, Vector *v2);
-Vector  Vector_perpendicular(Vector *v);
-Vector  Vector_rotate(Vector *v, Vector *axis, double angle);
+Vector  Vector_normalize(Vector v);
+Vector  Vector_scale(Vector v, double scalar);
+Vector  Vector_sum(Vector v1, Vector v2);
+Vector  Vector_crossProduct(Vector a, Vector b);
+double  Vector_dot(Vector v1, Vector v2);
+Vector  Vector_perpendicular(Vector v);
+Vector  Vector_rotate(Vector v, Vector axis, double angle);
+int     Vector_equal(Vector v1, Vector v2);
 
 // Debug
 void    Vector_print(Vector *v);
