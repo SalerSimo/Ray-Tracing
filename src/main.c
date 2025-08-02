@@ -116,35 +116,38 @@ void *thread_function(void *args){
     }
 }
 
-Scene *createScene(){
-    Point *camera = Point_init(0, 0, 0);
+Scene *CreateScene(){
+    Point *camera = Point_init(0, 0, 20);
 
-    double fieldOfView = 120 * M_PI / 180;
-    Scene *scene = Scene_init(camera, fieldOfView);
+    double fieldOfView = 90 * M_PI / 180;
+    Scene *scene = Scene_init(camera, fieldOfView);    
+    
+    double floorY = -10;
+    Surface *floor = Surface_createRectXZ(Point_init(-500, floorY, -500), 1000, 1000, 0, 0, COLOR_BLUE);
 
-    Surface *sphere1 = Surface_createSphere(Point_init(15, 0, -20), 7.5, 1, 0.5, COLOR_RED);
-    Surface *sphere2 = Surface_createSphere(Point_init(-15, 0, -20), 7.5, 0.2, 0.5, COLOR_BLUE);
+    int numSphere = 8;
+    Surface **spheres = malloc(numSphere * sizeof(Surface*));
 
-    Surface *rightWall = Surface_createRectYZ(Point_init(100, -75, -100), 200, 150, 0, 0, COLOR_GREEN);
-    Surface *leftWall = Surface_createRectYZ(Point_init(-100, -75, -100), 200, 150, 0, 0, COLOR_GREEN);
-    Surface *frontWall = Surface_createRectXY(Point_init(-100, -75, -100), 200, 150, 0, 0.1, Color_scale(COLOR_RED, 0.9));
-    Surface *backWall = Surface_createRectXY(Point_init(-100, -75, 100), 200, 150, 0, 0, COLOR_RED);
-    Surface *topWall = Surface_createRectXZ(Point_init(-100, 75, -100), 200, 200, 0, 0, COLOR_BLUE);
-    Surface *baseWall = Surface_createRectXZ(Point_init(-100, -75, -100), 200, 200, 0, 0, COLOR_BLUE);
+    double radius = 10;
+    spheres[0] = Surface_createSphere(Point_init(10, floorY+radius, -20), radius, 1, 0.5, COLOR_GREEN);
+    radius = 3;
+    spheres[1] = Surface_createSphere(Point_init(-5, floorY+radius, -10), radius, 0, 0, COLOR_RED);
+    radius = 1;
+    spheres[2] = Surface_createSphere(Point_init(10, floorY+radius, -10), radius, 0, 0, COLOR_YELLOW);
+    radius = 2;
+    spheres[3] = Surface_createSphere(Point_init(5, floorY+radius, -12), radius, 0, 0, COLOR_GREEN);
+    radius = 4;
+    spheres[4] = Surface_createSphere(Point_init(20, floorY+radius, -12), radius, 0, 0.1, COLOR_ORANGE);
+    radius = 15;
+    spheres[5] = Surface_createSphere(Point_init(-20, floorY+radius, -30), radius, 0.2, 0.5, COLOR_YELLOW);
+    radius = 1.5;
+    spheres[6] = Surface_createSphere(Point_init(5, floorY+radius, -2), radius, 0, 0.2, COLOR_CYAN);
+    radius = 1.5;
+    spheres[7] = Surface_createSphere(Point_init(-10, floorY+radius, 0), radius, 0, 0.2, COLOR_MAGENTA);
 
-    int n = 8;
-    Surface **list = malloc(n * sizeof(Surface*));
-    list[0] = sphere1;
-    list[1] = sphere2;
-    list[2] = frontWall;
-    list[3] = rightWall;
-    list[4] = leftWall;
-    list[5] = topWall;
-    list[6] = baseWall;
-    list[7] = backWall;
-
-    Light *lightSource = Light_new(Point_init(15, 10, -10), 1, COLOR_WHITE);
-    Scene_fill(scene, lightSource, list, n);
+    Light *lightSource = Light_new(Point_init(10, 5, 0), 1, COLOR_WHITE);
+    Scene_fill(scene, lightSource, &floor, 1);
+    Scene_addSurfaces(scene, spheres, numSphere);
 }
 
 void SimulateScene(Scene *scene, SDL_Window *window, int antiAliasingFactor){
