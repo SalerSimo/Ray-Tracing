@@ -71,11 +71,14 @@ int getIndex(char *word, char **array, int n){
 
 
 Surface* Surface_fromOBJ(const char *fileName) {
-    FILE *file = fopen(GetFullPath((char *)fileName), "r");
+    char *fullPath = GetFullPath((char *)fileName);
+    FILE *file = fopen(fullPath, "r");
     if (!file) {
         perror("Failed to open OBJ file");
         return NULL;
     }
+
+    char *directoryPath = GetDirectoryPath(fullPath);
 
     Point **points = NULL;
     int pointCapacity = 64, pointCount = 0;
@@ -134,7 +137,7 @@ Surface* Surface_fromOBJ(const char *fileName) {
             char *word = strtok(line, " \t\r\n");
             if(strcmp(word, "mtllib") == 0){
                 word = strtok(NULL, " \t\r\n");
-                numColors = LoadColors(GetFullPath(word), &colorNames, &colors);
+                numColors = LoadColors(strcat(directoryPath, word), &colorNames, &colors);
             }
             else if(strcmp(word, "usemtl") == 0){
                 word = strtok(NULL, " \t\r\n");
