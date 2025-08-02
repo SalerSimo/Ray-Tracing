@@ -256,8 +256,36 @@ void Triangle_translate(Triangle *t, Vector *translation){
 }
 
 void Surface_translate(Surface *surface, Vector *translation){
+    if(surface == NULL || translation == NULL) return;
     surface->center = Point_translate(surface->center, translation);
     for(int i = 0; i < surface->numTriangles; i++){
         Triangle_translate(surface->triangles[i], translation);
+    }
+}
+
+void Surface_scale(Surface *surface, double scalar){
+    if(surface == NULL || scalar < 0) return;
+    surface->maxDistanceFromCenter *= scalar;
+    for(int i = 0; i < surface->numTriangles; i++){
+        Vector v;
+        Triangle *t = surface->triangles[i];
+
+        v = Vector_fromPoints(surface->center, t->a);
+        v = Vector_scale(&v, scalar);
+        t->a->x = surface->center->x + v.x;
+        t->a->y = surface->center->y + v.y;
+        t->a->z = surface->center->z + v.z;
+
+        v = Vector_fromPoints(surface->center, t->b);
+        v = Vector_scale(&v, scalar);
+        t->b->x = surface->center->x + v.x;
+        t->b->y = surface->center->y + v.y;
+        t->b->z = surface->center->z + v.z;
+
+        v = Vector_fromPoints(surface->center, t->c);
+        v = Vector_scale(&v, scalar);
+        t->c->x = surface->center->x + v.x;
+        t->c->y = surface->center->y + v.y;
+        t->c->z = surface->center->z + v.z;
     }
 }

@@ -128,6 +128,14 @@ Surface *Surface_createSphere(Point *center, double radius, double reflexivity, 
 void Surface_translate(Surface *surface, Vector *translation);
 
 /**
+ * @brief Scales a surface by a given scalar.
+ * 
+ * @param surface Pointer to the surface to scale.
+ * @param scalar The factor to scale the surface with.
+ */
+void Surface_scale(Surface *surface, double scalar);
+
+/**
  * Computes and returns the surface normal of a triangle.
  * The normal is calculated using the cross product of two edges of the triangle,
  * and is normalized to 1 unit length.
