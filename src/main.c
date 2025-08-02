@@ -147,7 +147,7 @@ Scene *createScene(){
     Scene_fill(scene, lightSource, list, n);
 }
 
-void SimulateScene(Scene *scene, SDL_Window *window){
+void SimulateScene(Scene *scene, SDL_Window *window, int antiAliasingFactor){
     int nThread = 12;
     Display(scene, window, nThread, 1, antiAliasingFactor);
 
@@ -242,8 +242,8 @@ int main() {
     SDL_Window* window = InitWindow();
     if(window == NULL) return 1;
 
-    Scene *scene = createScene();
-    SimulateScene(scene, window, 2);
+    Scene *scene = CreateScene();
+    SimulateScene(scene, window, 1);
 }
 
 void Display(Scene *scene, SDL_Window *window, int nThread, bool verbose, int antiAliasingFactor){
