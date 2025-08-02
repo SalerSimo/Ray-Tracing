@@ -2,3 +2,5 @@
 build/
 run/
 RayTracing.exe
+*.mtl
+*.obj
