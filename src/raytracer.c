@@ -55,20 +55,16 @@ Color TraceRayR(Scene *scene, Line *l, int depth){
     if(nearSurface == NULL) return Color_multiply(BACKGROUND_COLOR, scene->lightSource->color);
     if (nearSurface->type == LIGHT) return intersectionTriangle->color;
 
-    Vector vectorLight = Vector_fromPoints(intersectionPoint, lightPosition);
-    vectorLight = Vector_normalize(vectorLight);
+    Vector vectorLight = Vector_normalize(Vector_fromPoints(intersectionPoint, lightPosition));
 
     Vector normal;
-    if(nearSurface->type == SPHERE){
+    if(nearSurface->type == SPHERE)
         normal = Vector_fromPoints(nearSurface->center, intersectionPoint);
-    }
-    else{
+    else
         normal = Triangle_getNormal(intersectionTriangle);
-    }
     normal = Vector_normalize(normal);
-    if(Vector_dot(normal, *l->v) > 0){
+    if(Vector_dot(normal, *l->v) > 0)
         normal = Vector_scale(normal, -1);
-    }
 
     double epsilon = 1e-3;
     Vector offset = Vector_scale(normal, epsilon);
@@ -113,23 +109,16 @@ Color TraceRayR(Scene *scene, Line *l, int depth){
 
     shadowFactor = __max(shadowFactor, 0.1);
 
-    Vector N = normal;
-    Vector L = vectorLight;
-    Vector oppositeDirection = Vector_scale(*l->v, -1);
-    Vector V = Vector_normalize(oppositeDirection);
+    Vector oppositeDirection = Vector_normalize(Vector_scale(*l->v, -1));
     Vector R;
 
-    double diffuseStrength = __max(0.1, Vector_dot(N, L));
+    double diffuseStrength = __max(0.1, Vector_dot(normal, vectorLight));
 
-    double NdotL = Vector_dot(N, L);
-    Vector tempN = N;
-    tempN = Vector_scale(tempN, 2 * NdotL);
-    L = Vector_scale(L, -1);
-    R = Vector_sum(tempN, L);
-    R = Vector_normalize(R);
+    Vector tempN = Vector_scale(normal, 2 * Vector_dot(normal, vectorLight));
+    R = Vector_normalize(Vector_sum(tempN, Vector_scale(vectorLight, -1)));
 
     int shininess = 32;
-    double spec = pow(__max(Vector_dot(R, V), 0.0), shininess);
+    double spec = pow(__max(Vector_dot(R, oppositeDirection), 0.0), shininess);
     double specularStrength = nearSurface->smoothness;
     
     Color diffuseColor = Color_scale(Color_multiply(intersectionTriangle->color, scene->lightSource->color), diffuseStrength * shadowFactor);
