@@ -6,8 +6,8 @@
 #include<pthread.h>
 #include"project.h"
 
-#define WIDTH 500
-#define HEIGHT 300
+#define WIDTH 750
+#define HEIGHT 450
 
 
 typedef struct{
