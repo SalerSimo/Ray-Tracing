@@ -51,7 +51,7 @@ Color GetPixelColor(double i, double j, ThreadData *data){
     
     p = Point_init(rotatedX, y, rotatedZ);
 
-    Vector direction = Vector_fromPoints(camera, p);
+    Vector direction = Vector_normalize(Vector_fromPoints(camera, p));
     Line *l = Line_init(camera, &direction);
 
     return TraceRay(scene, l);
