@@ -107,18 +107,18 @@ Color TraceRayR(Scene *scene, Line *l, int depth){
         shadowFactor = 1 - isInShadow(scene, nearSurface, rayOrigin, lightPosition);
     }
 
-    shadowFactor = __max(shadowFactor, 0.1);
+    shadowFactor = fmax(shadowFactor, 0.1);
 
     Vector oppositeDirection = Vector_normalize(Vector_scale(*l->v, -1));
     Vector R;
 
-    double diffuseStrength = __max(0.1, Vector_dot(normal, vectorLight));
+    double diffuseStrength = fmax(0.1, Vector_dot(normal, vectorLight));
 
     Vector tempN = Vector_scale(normal, 2 * Vector_dot(normal, vectorLight));
     R = Vector_normalize(Vector_sum(tempN, Vector_scale(vectorLight, -1)));
 
     int shininess = 32;
-    double spec = pow(__max(Vector_dot(R, oppositeDirection), 0.0), shininess);
+    double spec = pow(fmax(Vector_dot(R, oppositeDirection), 0.0), shininess);
     double specularStrength = nearSurface->smoothness;
     
     Color diffuseColor = Color_scale(Color_multiply(intersectionTriangle->color, scene->lightSource->color), diffuseStrength * shadowFactor);

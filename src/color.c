@@ -1,4 +1,5 @@
 #include<stdlib.h>
+#include<math.h>
 #include"color.h"
 
 Color Color_new(uint32_t color){
@@ -71,9 +72,9 @@ Color Color_blend(Color c1, Color c2, double t){
 Color Color_add(Color c1, Color c2){
     uint32_t colorA = c1.color;
     uint32_t colorB = c2.color;
-    int r = __min(((colorA >> 16) & 0xFF) + ((colorB >> 16) & 0xFF), 255);
-    int g = __min(((colorA >> 8) & 0xFF) + ((colorB >> 8) & 0xFF), 255);
-    int b = __min((colorA & 0xFF) + (colorB & 0xFF), 255);
+    int r = fmin(((colorA >> 16) & 0xFF) + ((colorB >> 16) & 0xFF), 255);
+    int g = fmin(((colorA >> 8) & 0xFF) + ((colorB >> 8) & 0xFF), 255);
+    int b = fmin((colorA & 0xFF) + (colorB & 0xFF), 255);
     
     Color result;
     result.color = (r << 16) | (g << 8) | b;
