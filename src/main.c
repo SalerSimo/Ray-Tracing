@@ -228,6 +228,15 @@ SDL_Window* InitWindow(){
         SDL_Quit();
         return NULL;
     }
+
+    SDL_Surface *icon = SDL_LoadBMP(GetFullPath("icon.bmp"));
+    if (!icon) {
+        printf("Failed to load icon.bmp: %s\n", SDL_GetError());
+    } else {
+        SDL_SetWindowIcon(window, icon);
+        SDL_DestroySurface(icon);
+    }
+
     return window;
 }
 
