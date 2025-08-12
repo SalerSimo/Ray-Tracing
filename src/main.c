@@ -246,7 +246,7 @@ int main() {
     if(window == NULL) return 1;
 
     Scene *scene = CreateScene();
-    SimulateScene(scene, window, 1);
+    SimulateScene(scene, window, 2);
 }
 
 void Display(Scene *scene, SDL_Window *window, int nThread, bool verbose, int antiAliasingFactor){
