@@ -166,30 +166,12 @@ void SimulateScene(Scene *scene, SDL_Window *window, int antiAliasingFactor){
             else if(event.type == SDL_EVENT_WINDOW_RESIZED){
                 Display(scene, window, nThread, 1, antiAliasingFactor);
             }
-            else if(event.type == SDL_EVENT_MOUSE_BUTTON_DOWN){
-                double angleStep = 10;
-                angleStep = angleStep * M_PI / 180;
-
-                switch(event.button.button){
-                    case SDL_BUTTON_LEFT:
-                        break;
-                    case SDL_BUTTON_RIGHT:
-                        angleStep *= -1;
-                        break;
-                    default:
-                        continue;
-                }
-
-                for(int i = 0; i < numFrame; i++){
-                    scene->rotationAngle += angleStep / numFrame;
-                    Display(scene, window, nThread, 0, antiAliasingFactor);
-                }
-            }
             else if(event.type == SDL_EVENT_KEY_DOWN){
                 SDL_Keycode key = event.key.key;
                 double moveStep = 4;
                 double deltaX = 0, deltaZ = 0, deltaY = 0;
                 double angle = scene->rotationAngle;
+                double angleStep = 0;
                 switch(key){
                     case SDLK_W:
                         deltaZ = -moveStep*cos(angle);
@@ -207,11 +189,17 @@ void SimulateScene(Scene *scene, SDL_Window *window, int antiAliasingFactor){
                         deltaZ = moveStep*sin(angle);
                         deltaX = -moveStep*cos(angle);
                         break;
-                    case SDLK_UP:
+                    case SDLK_R:
                         deltaY = 2;
                         break;
-                    case SDLK_DOWN:
+                    case SDLK_F:
                         deltaY = -2;
+                        break;
+                    case SDLK_Q:
+                        angleStep = 10 * M_PI / 180;
+                        break;
+                    case SDLK_E:
+                        angleStep = -10 * M_PI / 180;
                         break;
                     default:
                         break;
@@ -220,6 +208,7 @@ void SimulateScene(Scene *scene, SDL_Window *window, int antiAliasingFactor){
                     scene->camera->x += deltaX / numFrame;
                     scene->camera->z += deltaZ / numFrame;
                     scene->camera->y += deltaY / numFrame;
+                    scene->rotationAngle += angleStep / numFrame;
                     Display(scene, window, nThread, 0, antiAliasingFactor);
                 }
             }
