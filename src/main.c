@@ -148,6 +148,8 @@ Scene *CreateScene(){
     Light *lightSource = Light_new(Point_init(10, 5, 0), 1, COLOR_WHITE);
     Scene_fill(scene, lightSource, &floor, 1);
     Scene_addSurfaces(scene, spheres, numSphere);
+
+    return scene;
 }
 
 void SimulateScene(Scene *scene, SDL_Window *window, int antiAliasingFactor){
