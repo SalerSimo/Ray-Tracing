@@ -125,7 +125,7 @@ Surface *Surface_createSphere(Point *center, double radius, double reflexivity, 
  * @param surface Pointer to the Surface to translate.
  * @param translation Pointer to the Vector representing the translation offset.
  */
-void Surface_translate(Surface *surface, Vector *translation);
+void Surface_translate(Surface *surface, Vector translation);
 
 /**
  * @brief Scales a surface by a given scalar.

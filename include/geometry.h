@@ -27,7 +27,7 @@ Point*  Point_init(double x, double y, double z);
 
 // Operations
 double  Point_distanceSquared(Point *a, Point *b);
-Point*  Point_translate(Point *p, Vector *v);
+Point*  Point_translate(Point *p, Vector v);
 
 // Debug
 void    Point_print(Point *p);

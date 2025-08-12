@@ -249,14 +249,14 @@ Surface *Surface_createBox(Point *origin, double width, double height, double de
     return box;
 }
 
-void Triangle_translate(Triangle *t, Vector *translation){
+void Triangle_translate(Triangle *t, Vector translation){
     t->a = Point_translate(t->a, translation);
     t->b = Point_translate(t->b, translation);
     t->c = Point_translate(t->c, translation);
 }
 
-void Surface_translate(Surface *surface, Vector *translation){
-    if(surface == NULL || translation == NULL) return;
+void Surface_translate(Surface *surface, Vector translation){
+    if(surface == NULL) return;
     surface->center = Point_translate(surface->center, translation);
     for(int i = 0; i < surface->numTriangles; i++){
         Triangle_translate(surface->triangles[i], translation);

@@ -83,8 +83,8 @@ Point *Point_init(double x, double y, double z){
     return p;
 }
 
-Point *Point_translate(Point *p, Vector *v){
-    return Point_init(p->x + v->x, p->y + v->y, p->z + v->z);
+Point *Point_translate(Point *p, Vector v){
+    return Point_init(p->x + v.x, p->y + v.y, p->z + v.z);
 }
 
 void Point_print(Point *p){

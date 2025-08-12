@@ -68,7 +68,7 @@ Color TraceRayR(Scene *scene, Line *l, int depth){
 
     double epsilon = 1e-3;
     Vector offset = Vector_scale(normal, epsilon);
-    Point *rayOrigin = Point_translate(intersectionPoint, &offset);
+    Point *rayOrigin = Point_translate(intersectionPoint, offset);
     int inShadow = 0;
     double shadowFactor = 1;
     if(scene->lightSource->radius > 0){
@@ -80,7 +80,7 @@ Color TraceRayR(Scene *scene, Line *l, int depth){
         double angle = 2 * M_PI / numCheck;
         for(int i = 0; i < numCheck; i++){
             e1 = Vector_rotate(e1, vectorLight, angle);
-            if(isInShadow(scene, nearSurface, rayOrigin, Point_translate(lightPosition, &e1))){
+            if(isInShadow(scene, nearSurface, rayOrigin, Point_translate(lightPosition, e1))){
                 inShadow = 1;
                 break;
             }
@@ -96,7 +96,7 @@ Color TraceRayR(Scene *scene, Line *l, int depth){
                 Vector randomTraslation = Vector_rotate(e1, vectorLight, theta);
                 randomTraslation = Vector_scale(randomTraslation, r);
                 
-                Point *randomLightPoint = Point_translate(lightPosition, &randomTraslation);
+                Point *randomLightPoint = Point_translate(lightPosition, randomTraslation);
 
                 occluded += isInShadow(scene, nearSurface, rayOrigin, randomLightPoint);
             }
@@ -131,7 +131,7 @@ Color TraceRayR(Scene *scene, Line *l, int depth){
         double epsilon = 1e-5;
         Vector delta = Vector_scale(normal, epsilon);
 
-        Line *reflexLine = Line_init(Point_translate(intersectionPoint, &delta), &reflex);
+        Line *reflexLine = Line_init(Point_translate(intersectionPoint, delta), &reflex);
         Color reflectedColor = TraceRayR(scene, reflexLine, depth + 1);
         reflectedColor = Color_scale(reflectedColor, 0.95); // a surface cannot reflect 100% of the light it absorbs
         diffuseColor = Color_blend(diffuseColor, reflectedColor, nearSurface->reflexivity);
