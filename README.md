@@ -63,7 +63,7 @@ gcc src/*.c -Iinclude -lSDL3 -o run/RayTracing.exe
 
 Or just run `Run.cmd`
 
-<br>
+<br><br>
 
 It is also possible to specify the anti-aliasing factor and the custom objects to insert in the scene by passing them as line arguments:
 
