@@ -116,7 +116,7 @@ void *thread_function(void *args){
     }
 }
 
-Scene *CreateScene(){
+Scene *CreateScene(int numObj, char **objs){
     Point *camera = Point_init(0, 0, 20);
 
     double fieldOfView = 90 * M_PI / 180;
@@ -148,6 +148,15 @@ Scene *CreateScene(){
     Light *lightSource = Light_new(Point_init(10, 5, 0), 1, COLOR_WHITE);
     Scene_fill(scene, lightSource, &floor, 1);
     Scene_addSurfaces(scene, spheres, numSphere);
+
+    if(numObj <= 0) return scene;
+
+    Surface **objects = malloc(numObj * sizeof(Surface*));
+    for(int i = 0; i < numObj; i++){
+        objects[i] = Surface_fromOBJ(objs[i]);
+    }
+
+    Scene_addSurfaces(scene, objects, numObj);
 
     return scene;
 }
@@ -240,13 +249,18 @@ SDL_Window* InitWindow(){
     return window;
 }
 
-int main() {
+int main(int argc, char **argv) {
+    int antiAliasingFactor = 1;
+    if(argc >= 2){
+        antiAliasingFactor = atoi(argv[1]);
+    }
     srand(time(NULL));
     SDL_Window* window = InitWindow();
     if(window == NULL) return 1;
 
-    Scene *scene = CreateScene();
-    SimulateScene(scene, window, 2);
+    Scene *scene = CreateScene(argc - 2, argv + 2);
+    SDL_Delay(200);
+    SimulateScene(scene, window, antiAliasingFactor);
 }
 
 void Display(Scene *scene, SDL_Window *window, int nThread, bool verbose, int antiAliasingFactor){
