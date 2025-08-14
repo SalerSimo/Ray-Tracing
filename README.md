@@ -9,6 +9,7 @@ A ray tracer software that renders a 3D scenes with realistic lighting, reflecti
 - Support for loading and rendering `.obj` 3D model files.
 - CMake build automation
 - Doxy-style documentation
+- Multithreaded rendering for faster performance
 
 ## Camera Controls
 - **W / S** → Move forward / backward
