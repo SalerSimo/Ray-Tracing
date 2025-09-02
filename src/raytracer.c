@@ -39,6 +39,8 @@ Color TraceRayR(Scene *scene, Line *l, int depth){
     Triangle *intersectionTriangle = NULL;
     Point *lightPosition = scene->lightSource->position;
 
+    Light *light = scene->lightSource;
+
     for(int i = 0; i < scene->numSurfaces; i++){
         if(scene->surfaces[i] == NULL) continue;
         Point *p = Surface_intersection(scene->surfaces[i], l, &t);
@@ -52,7 +54,7 @@ Color TraceRayR(Scene *scene, Line *l, int depth){
             }
         }
     }
-    if(nearSurface == NULL) return Color_multiply(BACKGROUND_COLOR, scene->lightSource->color);
+    if(nearSurface == NULL) return Color_multiply(BACKGROUND_COLOR, light->color);
     if (nearSurface->type == LIGHT) return intersectionTriangle->color;
 
     Vector vectorLight = Vector_normalize(Vector_fromPoints(intersectionPoint, lightPosition));
@@ -73,7 +75,7 @@ Color TraceRayR(Scene *scene, Line *l, int depth){
     double shadowFactor = 1;
     if(scene->lightSource->radius > 0){
         Vector e1 = Vector_normalize(Vector_perpendicular(vectorLight));
-        e1 = Vector_scale(e1, scene->lightSource->radius * 1.2);
+        e1 = Vector_scale(e1, light->radius * 1.2);
 
         //check if the intersection point can be in shadow
         int numCheck = 8;
@@ -88,10 +90,10 @@ Color TraceRayR(Scene *scene, Line *l, int depth){
         e1 = Vector_normalize(Vector_perpendicular(vectorLight));
         if(inShadow){
             int occluded = 0;
-            int numSamples = scene->lightSource->radius == 0 ? 1 : SHADOW_SAMPLES;
+            int numSamples = light->radius == 0 ? 1 : SHADOW_SAMPLES;
             for (int s = 0; s < numSamples; s++) {
                 double theta = ((double)rand() / RAND_MAX) * 2 * M_PI;
-                double r = scene->lightSource->radius * sqrt((double)rand() / RAND_MAX);
+                double r = light->radius * sqrt((double)rand() / RAND_MAX);
 
                 Vector randomTraslation = Vector_rotate(e1, vectorLight, theta);
                 randomTraslation = Vector_scale(randomTraslation, r);
@@ -121,7 +123,7 @@ Color TraceRayR(Scene *scene, Line *l, int depth){
     double spec = pow(fmax(Vector_dot(R, oppositeDirection), 0.0), shininess);
     double specularStrength = nearSurface->smoothness;
     
-    Color diffuseColor = Color_scale(Color_multiply(intersectionTriangle->color, scene->lightSource->color), diffuseStrength * shadowFactor);
+    Color diffuseColor = Color_scale(Color_multiply(intersectionTriangle->color, light->color), diffuseStrength * shadowFactor);
     Color specularColor = Color_scale(COLOR_WHITE, specularStrength * spec * shadowFactor);
 
     if (nearSurface->reflexivity > 0 && depth < MAX_DEPTH) {
@@ -137,7 +139,13 @@ Color TraceRayR(Scene *scene, Line *l, int depth){
         diffuseColor = Color_blend(diffuseColor, reflectedColor, nearSurface->reflexivity);
     }
     Color finalColor = Color_add(diffuseColor, specularColor);
-    return finalColor;
+
+
+    double distanceSquared = Point_distanceSquared(intersectionPoint, lightPosition);
+    double attenuation = light->constant + light->linear * sqrt(distanceSquared) + light->quadratic * distanceSquared;
+    attenuation = 1 / attenuation;
+
+    return Color_scale(finalColor, attenuation);
 }
 
 Point *intersectionPoint(Line *l, Triangle *t){

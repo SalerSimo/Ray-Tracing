@@ -11,6 +11,8 @@ typedef struct{
     Point *position;
     double radius;
     Color color;
+
+    double constant, linear, quadratic;
 }Light;
 
 /**

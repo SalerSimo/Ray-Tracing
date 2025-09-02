@@ -53,5 +53,9 @@ Light *Light_new(Point *position, double radius, Color lightColor){
     light->position = position;
     light->radius = radius;
     light->color = lightColor;
+
+    light->constant = 1;
+    light->linear = 0.0009;
+    light->quadratic = 0.000032;
     return light;
 }
