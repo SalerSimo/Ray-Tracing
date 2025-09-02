@@ -31,6 +31,53 @@ int isInShadow(Scene *scene, Surface *nearSurface, Point *intersectionPoint, Poi
     return 0;
 }
 
+double CalculateShadowFactor(Scene *scene, Surface *nearSurface, Vector normal, Vector vectorLight, Point *intersectionPoint){
+    double epsilon = 1e-3;
+    Vector offset = Vector_scale(normal, epsilon);
+    Point *rayOrigin = Point_translate(intersectionPoint, offset);
+    int inShadow = 0;
+    double shadowFactor = 1;
+    Light *light = scene->lightSource;
+    if(light->radius > 0){
+        Vector e1 = Vector_normalize(Vector_perpendicular(vectorLight));
+        e1 = Vector_scale(e1, light->radius * 1.2);
+
+        //check if the intersection point can be in shadow
+        int numCheck = 8;
+        double angle = 2 * M_PI / numCheck;
+        for(int i = 0; i < numCheck; i++){
+            e1 = Vector_rotate(e1, vectorLight, angle);
+            if(isInShadow(scene, nearSurface, rayOrigin, Point_translate(light->position, e1))){
+                inShadow = 1;
+                break;
+            }
+        }
+        e1 = Vector_normalize(Vector_perpendicular(vectorLight));
+        if(inShadow){
+            int occluded = 0;
+            int numSamples = light->radius == 0 ? 1 : SHADOW_SAMPLES;
+            for (int s = 0; s < numSamples; s++) {
+                double theta = ((double)rand() / RAND_MAX) * 2 * M_PI;
+                double r = light->radius * sqrt((double)rand() / RAND_MAX);
+
+                Vector randomTraslation = Vector_rotate(e1, vectorLight, theta);
+                randomTraslation = Vector_scale(randomTraslation, r);
+                
+                Point *randomLightPoint = Point_translate(light->position, randomTraslation);
+
+                occluded += isInShadow(scene, nearSurface, rayOrigin, randomLightPoint);
+            }
+            shadowFactor = 1.0 - ((double)occluded / numSamples);
+        }
+    }
+    else{
+        shadowFactor = 1 - isInShadow(scene, nearSurface, rayOrigin, light->position);
+    }
+
+    shadowFactor = fmax(shadowFactor, 0.1);
+    return shadowFactor;
+}
+
 Color TraceRayR(Scene *scene, Line *l, int depth){
     Triangle *t;
     Surface *nearSurface = NULL;
@@ -68,48 +115,7 @@ Color TraceRayR(Scene *scene, Line *l, int depth){
     if(Vector_dot(normal, *l->v) > 0)
         normal = Vector_scale(normal, -1);
 
-    double epsilon = 1e-3;
-    Vector offset = Vector_scale(normal, epsilon);
-    Point *rayOrigin = Point_translate(intersectionPoint, offset);
-    int inShadow = 0;
-    double shadowFactor = 1;
-    if(scene->lightSource->radius > 0){
-        Vector e1 = Vector_normalize(Vector_perpendicular(vectorLight));
-        e1 = Vector_scale(e1, light->radius * 1.2);
-
-        //check if the intersection point can be in shadow
-        int numCheck = 8;
-        double angle = 2 * M_PI / numCheck;
-        for(int i = 0; i < numCheck; i++){
-            e1 = Vector_rotate(e1, vectorLight, angle);
-            if(isInShadow(scene, nearSurface, rayOrigin, Point_translate(lightPosition, e1))){
-                inShadow = 1;
-                break;
-            }
-        }
-        e1 = Vector_normalize(Vector_perpendicular(vectorLight));
-        if(inShadow){
-            int occluded = 0;
-            int numSamples = light->radius == 0 ? 1 : SHADOW_SAMPLES;
-            for (int s = 0; s < numSamples; s++) {
-                double theta = ((double)rand() / RAND_MAX) * 2 * M_PI;
-                double r = light->radius * sqrt((double)rand() / RAND_MAX);
-
-                Vector randomTraslation = Vector_rotate(e1, vectorLight, theta);
-                randomTraslation = Vector_scale(randomTraslation, r);
-                
-                Point *randomLightPoint = Point_translate(lightPosition, randomTraslation);
-
-                occluded += isInShadow(scene, nearSurface, rayOrigin, randomLightPoint);
-            }
-            shadowFactor = 1.0 - ((double)occluded / numSamples);
-        }
-    }
-    else{
-        shadowFactor = 1 - isInShadow(scene, nearSurface, rayOrigin, lightPosition);
-    }
-
-    shadowFactor = fmax(shadowFactor, 0.1);
+    double shadowFactor = CalculateShadowFactor(scene, nearSurface, normal, vectorLight, intersectionPoint);
 
     Vector oppositeDirection = Vector_normalize(Vector_scale(*l->v, -1));
     Vector R;
