@@ -200,6 +200,12 @@ void SimulateScene(Scene *scene, SDL_Window *window, int antiAliasingFactor){
 					case SDLK_E:
 						Camera_ProcessMovement(scene->camera, CAMERA_MOVEMENT_ROTATE_RIGHT);
 						break;
+					case SDLK_T:
+						Camera_ProcessMovement(scene->camera, CAMERA_MOVEMENT_ROTATE_UP);
+						break;
+					case SDLK_G:
+						Camera_ProcessMovement(scene->camera, CAMERA_MOVEMENT_ROTATE_DOWN);
+						break;
 					default:
 						display = false;
 						break;

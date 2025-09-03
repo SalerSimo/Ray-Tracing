@@ -53,4 +53,12 @@ void Camera_ProcessMovement(Camera *camera, CameraMovement movement){
             camera->front = Vector_rotate(camera->front, camera->up, -angleStep);
             camera->right = Vector_crossProduct(camera->front, camera->up);
       }
+      else if(movement == CAMERA_MOVEMENT_ROTATE_UP){
+            camera->front = Vector_rotate(camera->front, camera->right, -angleStep);
+            camera->up = Vector_crossProduct(camera->right, camera->front);
+      }
+      else if(movement == CAMERA_MOVEMENT_ROTATE_DOWN){
+            camera->front = Vector_rotate(camera->front, camera->right, angleStep);
+            camera->up = Vector_crossProduct(camera->right, camera->front);
+      }
 }
