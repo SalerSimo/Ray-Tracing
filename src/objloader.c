@@ -173,7 +173,7 @@ Surface* Surface_fromOBJ(const char *fileName) {
     surface->maxDistanceFromCenter = sqrt(maxDist);
     surface->color = COLOR_WHITE;
     surface->reflexivity = 0.0;
-    surface->smoothness = 0.0;
+    surface->shininess = 0.0;
     surface->type = GENERIC;
 
     return surface;

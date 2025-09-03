@@ -38,11 +38,11 @@ Surface *Surface_new(){
     surface->color = Color_new(0x000000);
     surface->maxDistanceFromCenter = 0;
     surface->reflexivity = 0;
-    surface->smoothness = 0.5;
+    surface->shininess = 0.5;
     return surface;
 }
 
-Surface *Surface_createSphere(Point *center, double radius, double reflexivity, double smoothness, Color color){
+Surface *Surface_createSphere(Point *center, double radius, double reflexivity, double shininess, Color color){
     int numPoints = (LAT_DIVS + 1) * LON_DIVS;
     Point **points = malloc(numPoints * sizeof(Point*));
     Surface *sphere = Surface_new();
@@ -97,7 +97,7 @@ Surface *Surface_createSphere(Point *center, double radius, double reflexivity, 
     sphere->color = color;
     sphere->type = SPHERE;
     sphere->reflexivity = reflexivity;
-    sphere->smoothness = smoothness;
+    sphere->shininess = shininess;
     return sphere;
 }
 
@@ -109,7 +109,7 @@ double Surface_area(Surface *surface){
     return area;
 }
 
-Surface *Surface_createRectXY(Point *origin, double width, double height, double reflexivity, double smoothness, Color color){
+Surface *Surface_createRectXY(Point *origin, double width, double height, double reflexivity, double shininess, Color color){
     Surface *rect = Surface_new();
     if(rect == NULL) return NULL;
 
@@ -136,11 +136,11 @@ Surface *Surface_createRectXY(Point *origin, double width, double height, double
 
     rect->color = color;
     rect->reflexivity = reflexivity;
-    rect->smoothness = smoothness;
+    rect->shininess = shininess;
     return rect;
 }
 
-Surface *Surface_createRectXZ(Point *origin, double width, double height, double reflexivity, double smoothness, Color color){
+Surface *Surface_createRectXZ(Point *origin, double width, double height, double reflexivity, double shininess, Color color){
     Surface *rect = Surface_new();
     if(rect == NULL) return NULL;
 
@@ -167,11 +167,11 @@ Surface *Surface_createRectXZ(Point *origin, double width, double height, double
 
     rect->color = color;
     rect->reflexivity = reflexivity;
-    rect->smoothness = smoothness;
+    rect->shininess = shininess;
     return rect;
 }
 
-Surface *Surface_createRectYZ(Point *origin, double width, double height, double reflexivity, double smoothness, Color color){
+Surface *Surface_createRectYZ(Point *origin, double width, double height, double reflexivity, double shininess, Color color){
     Surface *rect = Surface_new();
     if(rect == NULL) return NULL;
 
@@ -198,11 +198,11 @@ Surface *Surface_createRectYZ(Point *origin, double width, double height, double
 
     rect->color = color;
     rect->reflexivity = reflexivity;
-    rect->smoothness = smoothness;
+    rect->shininess = shininess;
     return rect;
 }
 
-Surface *Surface_createBox(Point *origin, double width, double height, double depth, double reflexivity, double smoothness, Color color) {
+Surface *Surface_createBox(Point *origin, double width, double height, double depth, double reflexivity, double shininess, Color color) {
     Surface *box = Surface_new();
     if (box == NULL) return NULL;
 
@@ -245,7 +245,7 @@ Surface *Surface_createBox(Point *origin, double width, double height, double de
 
     box->color = color;
     box->reflexivity = reflexivity;
-    box->smoothness = smoothness;
+    box->shininess = shininess;
     return box;
 }
 

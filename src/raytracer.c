@@ -127,7 +127,7 @@ Color TraceRayR(Scene *scene, Line *l, int depth){
 
     int shininess = 32;
     double spec = pow(fmax(Vector_dot(R, oppositeDirection), 0.0), shininess);
-    double specularStrength = nearSurface->smoothness;
+    double specularStrength = nearSurface->shininess;
     
     Color diffuseColor = Color_scale(Color_multiply(intersectionTriangle->color, light->color), diffuseStrength * shadowFactor);
     Color specularColor = Color_scale(COLOR_WHITE, specularStrength * spec * shadowFactor);

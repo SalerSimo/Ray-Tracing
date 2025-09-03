@@ -37,8 +37,8 @@ typedef struct{
     double maxDistanceFromCenter;
     /** Surface reflection coefficient (0 = no reflection, 1 = perfect mirror). */
     double reflexivity;
-    /** Surface smoothness (0 = fully rough, 1 = fully smooth). */
-    double smoothness;
+    /** Surface shininess (0 = fully rough, 1 = fully smooth). */
+    double shininess;
     /** Type of surface. */
     SurfaceType type;
 }Surface;
@@ -51,13 +51,13 @@ typedef struct{
  * @param width Length of the rectangle along the X-axis.
  * @param height Length of the rectangle along the Y-axis.
  * @param reflexivity Surface reflection coefficient (0 = no reflection, 1 = perfect mirror).
- * @param smoothness Surface smoothness (0 = fully rough, 1 = fully smooth).
+ * @param shininess Surface shininess (0 = fully rough, 1 = fully smooth).
  * @param color 32-bit RGB color of the box surface.
  * 
  * @return Pointer to the newly created Surface representing the rectangle,
  *         or NULL if memory allocation fails.
  */
-Surface *Surface_createRectXY(Point *origin, double width, double height, double reflexivity, double smoothness, Color color);
+Surface *Surface_createRectXY(Point *origin, double width, double height, double reflexivity, double shininess, Color color);
 
 /**
  * Creates a rectangular surface aligned to the X-Z plane.
@@ -66,13 +66,13 @@ Surface *Surface_createRectXY(Point *origin, double width, double height, double
  * @param width Length of the rectangle along the X-axis.
  * @param height Length of the rectangle along the Z-axis.
  * @param reflexivity Surface reflection coefficient (0 = no reflection, 1 = perfect mirror).
- * @param smoothness Surface smoothness (0 = fully rough, 1 = fully smooth).
+ * @param shininess Surface shininess (0 = fully rough, 1 = fully smooth).
  * @param color 32-bit RGB color of the box surface.
  * 
  * @return Pointer to the allocated Surface representing the rectangle,
  *         or NULL if memory allocation fails.
  */
-Surface *Surface_createRectXZ(Point *origin, double width, double height, double reflexivity, double smoothness, Color color);
+Surface *Surface_createRectXZ(Point *origin, double width, double height, double reflexivity, double shininess, Color color);
 
 /**
  * Creates a rectangular surface aligned to the Y-Z plane.
@@ -81,13 +81,13 @@ Surface *Surface_createRectXZ(Point *origin, double width, double height, double
  * @param width Length of the rectangle along the Z-axis.
  * @param height Length of the rectangle along the Y-axis.
  * @param reflexivity Surface reflection coefficient (0 = no reflection, 1 = perfect mirror).
- * @param smoothness Surface smoothness (0 = fully rough, 1 = fully smooth).
+ * @param shininess Surface shininess (0 = fully rough, 1 = fully smooth).
  * @param color 32-bit RGB color of the box surface.
  * 
  * @return Pointer to the allocated Surface representing the rectangle,
  *         or NULL if memory allocation fails.
  */
-Surface *Surface_createRectYZ(Point *origin, double width, double height, double reflexivity, double smoothness, Color color);
+Surface *Surface_createRectYZ(Point *origin, double width, double height, double reflexivity, double shininess, Color color);
 
 /**
  * Creates a 3D box-shaped Surface object.
@@ -97,13 +97,13 @@ Surface *Surface_createRectYZ(Point *origin, double width, double height, double
  * @param height Length of the box along the Y-axis.
  * @param depth Length of the box along the Z-axis.
  * @param reflexivity Surface reflection coefficient (0 = no reflection, 1 = perfect mirror).
- * @param smoothness Surface smoothness (0 = fully rough, 1 = fully smooth).
+ * @param shininess Surface shininess (0 = fully rough, 1 = fully smooth).
  * @param color 32-bit RGB color of the box surface.
  * 
  * @return Pointer to the allocated Surface representing the box 
  *         or NULL if allocation fails.
  */
-Surface *Surface_createBox(Point *origin, double width, double height, double depth, double reflexivity, double smoothness, Color color);
+Surface *Surface_createBox(Point *origin, double width, double height, double depth, double reflexivity, double shininess, Color color);
 
 /**
  * Creates a spherical surface centered at the given point.
@@ -117,7 +117,7 @@ Surface *Surface_createBox(Point *origin, double width, double height, double de
  * @return Pointer to the allocated Surface representing the sphere 
  *         or NULL if allocation fails.
  */
-Surface *Surface_createSphere(Point *center, double radius, double reflexivity, double smoothness, Color color);
+Surface *Surface_createSphere(Point *center, double radius, double reflexivity, double shininess, Color color);
 
 /**
  * @brief Translates all vertices of the Surface by a given vector.
