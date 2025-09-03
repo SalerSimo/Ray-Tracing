@@ -5,7 +5,7 @@
 #include<stdlib.h>
 
 #include"geometry.h"
-#include"surface.h"
+#include"model.h"
 
 typedef struct{
     Point *position;
@@ -18,7 +18,7 @@ typedef struct{
 /**
  * Represents a 3D scene for ray tracing.
  *
- * Contains camera position, light source, and an array of surfaces that define the geometry.
+ * Contains camera position, light source, and an array of models that define the geometry.
  * It also includes camera-related properties like the viewing distance and rotation angle.
  */
 typedef struct{
@@ -35,10 +35,10 @@ typedef struct{
      *  A positive angle corresponds to anti-clockwise rotation.
      */
     double rotationAngle;
-    /** Array of pointers to the surfaces in the scene. */
-    Surface **surfaces;
-    /** Number of surfaces in the scene. */
-    unsigned int numSurfaces;
+    /** Array of pointers to the models in the scene. */
+    Model **models;
+    /** Number of models in the scene. */
+    unsigned int numModels;
     /** Pointer to the light source of the scene. */
     Light *lightSource;
 }Scene;
@@ -58,27 +58,27 @@ typedef struct{
 Scene *Scene_init(Point *camera, double fieldOfView);
 
 /**
- * Initializes a scene with the given light source and surfaces.
+ * Initializes a scene with the given light source and models.
  * 
  * @param s The scene to fill.
  * @param lightSource Pointer to the position of the light source.
- * @param surfaces Array of pointers to the surfaces to include in the scene.
- * @param numSurfaces Number of surfaces in the array.
+ * @param models Array of pointers to the models to include in the scene.
+ * @param numModels Number of models in the array.
  */
-void Scene_fill(Scene *s, Light *lightSource, Surface **surfaces, int numSurfaces);
+void Scene_fill(Scene *s, Light *lightSource, Model **models, int numModels);
 
 
 /**
- * @brief Adds multiple surfaces to the scene.
+ * @brief Adds multiple models to the scene.
  *
  *
- * @param s Pointer to the Scene object to which surfaces will be added.
- * @param surfaces Array of pointers to Surface objects to be added.
- * @param numSurfaces Number of Surfaces in the array.
+ * @param s Pointer to the Scene object to which models will be added.
+ * @param models Array of pointers to Model objects to be added.
+ * @param numModels Number of Models in the array.
  *
- * @warning This function does not prevent duplicate Surface pointers from being added.
+ * @warning This function does not prevent duplicate Model pointers from being added.
  */
-void Scene_addSurfaces(Scene *s, Surface **surfaces, int numSurfaces);
+void Scene_addModels(Scene *s, Model **models, int numModels);
 
 
 Light *Light_new(Point *position, double radius, Color lightColor);

@@ -123,40 +123,40 @@ Scene *CreateScene(int numObj, char **objs){
     Scene *scene = Scene_init(camera, fieldOfView);    
     
     double floorY = -10;
-    Surface *floor = Surface_createRectXZ(Point_init(-500, floorY, -500), 1000, 1000, 0, 0, COLOR_BLUE);
+    Model *floor = Model_createRectXZ(Point_init(-500, floorY, -500), 1000, 1000, 0, 0, COLOR_BLUE);
 
     int numSphere = 8;
-    Surface **spheres = malloc(numSphere * sizeof(Surface*));
+    Model **spheres = malloc(numSphere * sizeof(Model*));
 
     double radius = 10;
-    spheres[0] = Surface_createSphere(Point_init(10, floorY+radius, -20), radius, 1, 0.5, COLOR_GREEN);
+    spheres[0] = Model_createSphere(Point_init(10, floorY+radius, -20), radius, 1, 0.5, COLOR_GREEN);
     radius = 3;
-    spheres[1] = Surface_createSphere(Point_init(-5, floorY+radius, -10), radius, 0, 0, COLOR_RED);
+    spheres[1] = Model_createSphere(Point_init(-5, floorY+radius, -10), radius, 0, 0, COLOR_RED);
     radius = 1;
-    spheres[2] = Surface_createSphere(Point_init(10, floorY+radius, -10), radius, 0, 0, COLOR_YELLOW);
+    spheres[2] = Model_createSphere(Point_init(10, floorY+radius, -10), radius, 0, 0, COLOR_YELLOW);
     radius = 2;
-    spheres[3] = Surface_createSphere(Point_init(5, floorY+radius, -12), radius, 0, 0, COLOR_GREEN);
+    spheres[3] = Model_createSphere(Point_init(5, floorY+radius, -12), radius, 0, 0, COLOR_GREEN);
     radius = 4;
-    spheres[4] = Surface_createSphere(Point_init(20, floorY+radius, -12), radius, 0, 0.1, COLOR_ORANGE);
+    spheres[4] = Model_createSphere(Point_init(20, floorY+radius, -12), radius, 0, 0.1, COLOR_ORANGE);
     radius = 15;
-    spheres[5] = Surface_createSphere(Point_init(-20, floorY+radius, -30), radius, 0.2, 0.5, COLOR_YELLOW);
+    spheres[5] = Model_createSphere(Point_init(-20, floorY+radius, -30), radius, 0.2, 0.5, COLOR_YELLOW);
     radius = 1.5;
-    spheres[6] = Surface_createSphere(Point_init(5, floorY+radius, -2), radius, 0, 0.2, COLOR_CYAN);
+    spheres[6] = Model_createSphere(Point_init(5, floorY+radius, -2), radius, 0, 0.2, COLOR_CYAN);
     radius = 1.5;
-    spheres[7] = Surface_createSphere(Point_init(-10, floorY+radius, 0), radius, 0, 0.2, COLOR_MAGENTA);
+    spheres[7] = Model_createSphere(Point_init(-10, floorY+radius, 0), radius, 0, 0.2, COLOR_MAGENTA);
 
     Light *lightSource = Light_new(Point_init(10, 5, 0), 1, COLOR_WHITE);
     Scene_fill(scene, lightSource, &floor, 1);
-    Scene_addSurfaces(scene, spheres, numSphere);
+    Scene_addModels(scene, spheres, numSphere);
 
     if(numObj <= 0) return scene;
 
-    Surface **objects = malloc(numObj * sizeof(Surface*));
+    Model **objects = malloc(numObj * sizeof(Model*));
     for(int i = 0; i < numObj; i++){
-        objects[i] = Surface_fromOBJ(objs[i]);
+        objects[i] = Model_fromOBJ(objs[i]);
     }
 
-    Scene_addSurfaces(scene, objects, numObj);
+    Scene_addModels(scene, objects, numObj);
 
     return scene;
 }

@@ -2,7 +2,7 @@
 #include<math.h>
 #include<stdio.h>
 #include<stdint.h>
-#include"surface.h"
+#include"model.h"
 
 Triangle *Triangle_init(Point *a, Point *b, Point *c, Color color){
     Triangle *t = malloc(sizeof(Triangle));
@@ -29,23 +29,23 @@ Vector Triangle_getNormal(Triangle *t){
     return Vector_normalize(normal);
 }
 
-Surface *Surface_new(){
-    Surface *surface = malloc(sizeof(Surface));
-    surface->type = GENERIC;
-    surface->numTriangles = 0;
-    surface->triangles = NULL;
-    surface->center = NULL;
-    surface->color = Color_new(0x000000);
-    surface->maxDistanceFromCenter = 0;
-    surface->reflexivity = 0;
-    surface->shininess = 0.5;
-    return surface;
+Model *Model_new(){
+    Model *model = malloc(sizeof(Model));
+    model->type = GENERIC;
+    model->numTriangles = 0;
+    model->triangles = NULL;
+    model->center = NULL;
+    model->color = Color_new(0x000000);
+    model->maxDistanceFromCenter = 0;
+    model->reflexivity = 0;
+    model->shininess = 0.5;
+    return model;
 }
 
-Surface *Surface_createSphere(Point *center, double radius, double reflexivity, double shininess, Color color){
+Model *Model_createSphere(Point *center, double radius, double reflexivity, double shininess, Color color){
     int numPoints = (LAT_DIVS + 1) * LON_DIVS;
     Point **points = malloc(numPoints * sizeof(Point*));
-    Surface *sphere = Surface_new();
+    Model *sphere = Model_new();
 
     int index = 0;
     for (int i = 0; i <= LAT_DIVS; i++) {
@@ -101,16 +101,16 @@ Surface *Surface_createSphere(Point *center, double radius, double reflexivity, 
     return sphere;
 }
 
-double Surface_area(Surface *surface){
+double Model_area(Model *model){
     double area = 0;
-    for(int i = 0; i < surface->numTriangles; i++){
-        area += Triangle_area(surface->triangles[i]);
+    for(int i = 0; i < model->numTriangles; i++){
+        area += Triangle_area(model->triangles[i]);
     }
     return area;
 }
 
-Surface *Surface_createRectXY(Point *origin, double width, double height, double reflexivity, double shininess, Color color){
-    Surface *rect = Surface_new();
+Model *Model_createRectXY(Point *origin, double width, double height, double reflexivity, double shininess, Color color){
+    Model *rect = Model_new();
     if(rect == NULL) return NULL;
 
     double x, y, z;
@@ -140,8 +140,8 @@ Surface *Surface_createRectXY(Point *origin, double width, double height, double
     return rect;
 }
 
-Surface *Surface_createRectXZ(Point *origin, double width, double height, double reflexivity, double shininess, Color color){
-    Surface *rect = Surface_new();
+Model *Model_createRectXZ(Point *origin, double width, double height, double reflexivity, double shininess, Color color){
+    Model *rect = Model_new();
     if(rect == NULL) return NULL;
 
     double x, y, z;
@@ -171,8 +171,8 @@ Surface *Surface_createRectXZ(Point *origin, double width, double height, double
     return rect;
 }
 
-Surface *Surface_createRectYZ(Point *origin, double width, double height, double reflexivity, double shininess, Color color){
-    Surface *rect = Surface_new();
+Model *Model_createRectYZ(Point *origin, double width, double height, double reflexivity, double shininess, Color color){
+    Model *rect = Model_new();
     if(rect == NULL) return NULL;
 
     double x, y, z;
@@ -202,8 +202,8 @@ Surface *Surface_createRectYZ(Point *origin, double width, double height, double
     return rect;
 }
 
-Surface *Surface_createBox(Point *origin, double width, double height, double depth, double reflexivity, double shininess, Color color) {
-    Surface *box = Surface_new();
+Model *Model_createBox(Point *origin, double width, double height, double depth, double reflexivity, double shininess, Color color) {
+    Model *box = Model_new();
     if (box == NULL) return NULL;
 
     double x = origin->x;
@@ -255,37 +255,37 @@ void Triangle_translate(Triangle *t, Vector translation){
     t->c = Point_translate(t->c, translation);
 }
 
-void Surface_translate(Surface *surface, Vector translation){
-    if(surface == NULL) return;
-    surface->center = Point_translate(surface->center, translation);
-    for(int i = 0; i < surface->numTriangles; i++){
-        Triangle_translate(surface->triangles[i], translation);
+void Model_translate(Model *model, Vector translation){
+    if(model == NULL) return;
+    model->center = Point_translate(model->center, translation);
+    for(int i = 0; i < model->numTriangles; i++){
+        Triangle_translate(model->triangles[i], translation);
     }
 }
 
-void Surface_scale(Surface *surface, double scalar){
-    if(surface == NULL || scalar < 0) return;
-    surface->maxDistanceFromCenter *= scalar;
-    for(int i = 0; i < surface->numTriangles; i++){
+void Model_scale(Model *model, double scalar){
+    if(model == NULL || scalar < 0) return;
+    model->maxDistanceFromCenter *= scalar;
+    for(int i = 0; i < model->numTriangles; i++){
         Vector v;
-        Triangle *t = surface->triangles[i];
+        Triangle *t = model->triangles[i];
 
-        v = Vector_fromPoints(surface->center, t->a);
+        v = Vector_fromPoints(model->center, t->a);
         v = Vector_scale(v, scalar);
-        t->a->x = surface->center->x + v.x;
-        t->a->y = surface->center->y + v.y;
-        t->a->z = surface->center->z + v.z;
+        t->a->x = model->center->x + v.x;
+        t->a->y = model->center->y + v.y;
+        t->a->z = model->center->z + v.z;
 
-        v = Vector_fromPoints(surface->center, t->b);
+        v = Vector_fromPoints(model->center, t->b);
         v = Vector_scale(v, scalar);
-        t->b->x = surface->center->x + v.x;
-        t->b->y = surface->center->y + v.y;
-        t->b->z = surface->center->z + v.z;
+        t->b->x = model->center->x + v.x;
+        t->b->y = model->center->y + v.y;
+        t->b->z = model->center->z + v.z;
 
-        v = Vector_fromPoints(surface->center, t->c);
+        v = Vector_fromPoints(model->center, t->c);
         v = Vector_scale(v, scalar);
-        t->c->x = surface->center->x + v.x;
-        t->c->y = surface->center->y + v.y;
-        t->c->z = surface->center->z + v.z;
+        t->c->x = model->center->x + v.x;
+        t->c->y = model->center->y + v.y;
+        t->c->z = model->center->z + v.z;
     }
 }

@@ -2,7 +2,7 @@
 #define RAYTRACER_H
 
 #include"geometry.h"
-#include"surface.h"
+#include"model.h"
 #include"scene.h"
 #include"color.h"
 
@@ -12,9 +12,9 @@
 /**
  * Traces a single ray in the scene and returns the resulting color.
  *
- * It computes the color seen along a given ray by checking for surface intersections, shading, and reflections.
+ * It computes the color seen along a given ray by checking for model intersections, shading, and reflections.
  *
- * @param scene Pointer to the scene containing surfaces and the light source.
+ * @param scene Pointer to the scene containing models and the light source.
  * @param l Pointer to the ray (Line) to trace.
  * @return The computed Color seen along the ray.
  */

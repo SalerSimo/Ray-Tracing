@@ -70,7 +70,7 @@ int getIndex(char *word, char **array, int n){
 }
 
 
-Surface* Surface_fromOBJ(const char *fileName) {
+Model* Model_fromOBJ(const char *fileName) {
     char *fullPath = GetFullPath((char *)fileName);
     FILE *file = fopen(fullPath, "r");
     if (!file) {
@@ -166,21 +166,21 @@ Surface* Surface_fromOBJ(const char *fileName) {
         if (d > maxDist) maxDist = d;
     }
 
-    Surface *surface = malloc(sizeof(Surface));
-    surface->numTriangles = triCount;
-    surface->triangles = triangles;
-    surface->center = center;
-    surface->maxDistanceFromCenter = sqrt(maxDist);
-    surface->color = COLOR_WHITE;
-    surface->reflexivity = 0.0;
-    surface->shininess = 0.0;
-    surface->type = GENERIC;
+    Model *model = malloc(sizeof(Model));
+    model->numTriangles = triCount;
+    model->triangles = triangles;
+    model->center = center;
+    model->maxDistanceFromCenter = sqrt(maxDist);
+    model->color = COLOR_WHITE;
+    model->reflexivity = 0.0;
+    model->shininess = 0.0;
+    model->type = GENERIC;
 
-    return surface;
+    return model;
 }
 
-int Surface_toOBJ(const Surface *surface, const char *fileName) {
-    if (!surface || !fileName) return -1;
+int Model_toOBJ(const Model *model, const char *fileName) {
+    if (!model || !fileName) return -1;
 
     FILE *file = fopen(fileName, "w");
     if (!file) {
@@ -190,14 +190,14 @@ int Surface_toOBJ(const Surface *surface, const char *fileName) {
 
     int vertexIndex = 1;
 
-    for (int i = 0; i < surface->numTriangles; ++i) {
-        Triangle *t = surface->triangles[i];
+    for (int i = 0; i < model->numTriangles; ++i) {
+        Triangle *t = model->triangles[i];
         fprintf(file, "v %f %f %f\n", t->a->x, t->a->y, t->a->z);
         fprintf(file, "v %f %f %f\n", t->b->x, t->b->y, t->b->z);
         fprintf(file, "v %f %f %f\n", t->c->x, t->c->y, t->c->z);
     }
 
-    for (int i = 0; i < surface->numTriangles; ++i) {
+    for (int i = 0; i < model->numTriangles; ++i) {
         fprintf(file, "f %d %d %d\n", vertexIndex, vertexIndex + 1, vertexIndex + 2);
         vertexIndex += 3;
     }
