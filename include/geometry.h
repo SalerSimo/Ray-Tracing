@@ -11,8 +11,8 @@ typedef struct{
 }Point;
 
 typedef struct{
-	Point *p;
-	Vector *v;
+	Point *origin;
+	Vector direction;
 }Line;
 
 typedef struct{
@@ -55,8 +55,8 @@ void    Vector_print(Vector *v);
 
 // ───── LINE ─────
 
-// Contructor
-Line*   Line_init(Point *p, Vector *v);
+// Constructor
+Line*   Line_init(Point *origin, Vector direction);
 
 // Operations
 double  Line_Point_distance(Line *l, Point *p);

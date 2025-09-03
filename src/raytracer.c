@@ -6,16 +6,16 @@
 #define SHADOW_SAMPLES 20
 
 
-Point *Model_intersection(Model *model, Line *l, Triangle **p_t);
-Color TraceRayR(Scene *scene, Line *l, int depth);
+Point *Model_intersection(Model *model, Ray *l, Triangle **p_t);
+Color TraceRayR(Scene *scene, Ray *l, int depth);
 
-Color TraceRay(Scene *scene, Line *l){
-	return TraceRayR(scene, l, 0);
+Color TraceRay(Scene *scene, Ray *ray){
+	return TraceRayR(scene, ray, 0);
 }
 
 int isInShadow(Scene *scene, Model *nearModel, Point *intersectionPoint, Point *lightPoint){
 	Vector toLight =  Vector_fromPoints(intersectionPoint, lightPoint);
-	Line *shadowRay = Line_init(intersectionPoint, &toLight);
+	Ray *shadowRay = Line_init(intersectionPoint, toLight);
 	for (int i = 0; i < scene->numModels; i++) {
 		if (scene->models[i] == nearModel || scene->models[i] == NULL || scene->models[i]->type == LIGHT) continue;
 		Triangle *t;
@@ -78,7 +78,7 @@ double CalculateShadowFactor(Scene *scene, Model *nearModel, Vector normal, Vect
 	return shadowFactor;
 }
 
-Color TraceRayR(Scene *scene, Line *l, int depth){
+Color TraceRayR(Scene *scene, Ray *ray, int depth){
 	Triangle *t;
 	Model *nearModel = NULL;
 	double minDistance = -1;
@@ -90,9 +90,9 @@ Color TraceRayR(Scene *scene, Line *l, int depth){
 
 	for(int i = 0; i < scene->numModels; i++){
 		if(scene->models[i] == NULL) continue;
-		Point *p = Model_intersection(scene->models[i], l, &t);
+		Point *p = Model_intersection(scene->models[i], ray, &t);
 		if(p != NULL){
-			double distance = Point_distanceSquared(l->p, p);
+			double distance = Point_distanceSquared(ray->origin, p);
 			if(minDistance == -1 || distance < minDistance){
 				nearModel = scene->models[i];
 				intersectionPoint = p;
@@ -112,12 +112,12 @@ Color TraceRayR(Scene *scene, Line *l, int depth){
 	else
 		normal = Triangle_getNormal(intersectionTriangle);
 	normal = Vector_normalize(normal);
-	if(Vector_dot(normal, *l->v) > 0)
+	if(Vector_dot(normal, ray->direction) > 0)
 		normal = Vector_scale(normal, -1);
 
 	double shadowFactor = CalculateShadowFactor(scene, nearModel, normal, vectorLight, intersectionPoint);
 
-	Vector oppositeDirection = Vector_normalize(Vector_scale(*l->v, -1));
+	Vector oppositeDirection = Vector_normalize(Vector_scale(ray->direction, -1));
 	Vector R;
 
 	double diffuseStrength = fmax(0.1, Vector_dot(normal, vectorLight));
@@ -133,13 +133,13 @@ Color TraceRayR(Scene *scene, Line *l, int depth){
 	Color specularColor = Color_scale(COLOR_WHITE, specularStrength * spec * shadowFactor);
 
 	if (nearModel->reflexivity > 0 && depth < MAX_DEPTH) {
-		Vector dir = Vector_normalize(*l->v);
+		Vector dir = Vector_normalize(ray->direction);
 		Vector tang = Vector_scale(normal, -2 * Vector_dot(normal, dir));
 		Vector reflex = Vector_sum(dir, tang);
 		double epsilon = 1e-5;
 		Vector delta = Vector_scale(normal, epsilon);
 
-		Line *reflexLine = Line_init(Point_translate(intersectionPoint, delta), &reflex);
+		Line *reflexLine = Line_init(Point_translate(intersectionPoint, delta), reflex);
 		Color reflectedColor = TraceRayR(scene, reflexLine, depth + 1);
 		reflectedColor = Color_scale(reflectedColor, 0.95); // a model cannot reflect 100% of the light it absorbs
 		diffuseColor = Color_blend(diffuseColor, reflectedColor, nearModel->reflexivity);
@@ -154,7 +154,7 @@ Color TraceRayR(Scene *scene, Line *l, int depth){
 	return Color_scale(finalColor, attenuation);
 }
 
-Point *intersectionPoint(Line *l, Triangle *t){
+Point *intersectionPoint(Ray *ray, Triangle *t){
 	Point *A, *B, *C;
 	A = t->a;
 	B = t->b;
@@ -163,20 +163,20 @@ Point *intersectionPoint(Line *l, Triangle *t){
 	Vector e1 = Vector_fromPoints(A, B);
 	Vector e2 = Vector_fromPoints(A, C);
 
-	Vector h = Vector_crossProduct(*l->v, e2);
+	Vector h = Vector_crossProduct(ray->direction, e2);
 	double a = Vector_dot(e1, h);
 	if (fabs(a) < EPSILON) {
 		return NULL;
 	}
 
-	Vector s = Vector_fromPoints(A, l->p);
+	Vector s = Vector_fromPoints(A, ray->origin);
 	double u = Vector_dot(s, h) / a;
 	if (u < 0.0 || u > 1.0) {
 		return NULL;
 	}
 
 	Vector q = Vector_crossProduct(s, e1);
-	double v = Vector_dot(*l->v, q) / a;
+	double v = Vector_dot(ray->direction, q) / a;
 	if (v < 0.0 || u + v > 1.0) {
 		return NULL;
 	}
@@ -186,20 +186,15 @@ Point *intersectionPoint(Line *l, Triangle *t){
 	if (ti < 1e-6) return NULL;
 
 
-	Point *intersectionPoint = Point_init(0, 0, 0);
-	Point *P0 = l->p;
-	Vector *D = l->v;
-	intersectionPoint->x = P0->x + ti * D->x;
-	intersectionPoint->y = P0->y + ti * D->y;
-	intersectionPoint->z = P0->z + ti * D->z;
+	Point* intersectionPoint = Point_translate(ray->origin, Vector_scale(ray->direction, ti));
 
 	return intersectionPoint;
 }
 
-Point *Sphere_intersection(Model *sphere, Line *l) {
+Point *Sphere_intersection(Model *sphere, Ray *ray) {
 	//if(sphere->type != SPHERE) return NULL;
-	Point *O = l->p;           // Ray origin
-	Vector D = *l->v;          // Ray direction (not necessarily normalized)
+	Point *O = ray->origin;
+	Vector D = ray->direction;
 	Point *C = sphere->center; // Sphere center
 	double r = sphere->maxDistanceFromCenter;
 
@@ -237,29 +232,29 @@ Point *Sphere_intersection(Model *sphere, Line *l) {
 	return intersection;
 }
 
-Point *Model_intersection(Model *model, Line *l, Triangle **p_t){
+Point *Model_intersection(Model *model, Ray *ray, Triangle **p_t){
 	*p_t = NULL;
 	if(model->type == SPHERE || model->type == LIGHT){
 		*p_t = model->triangles[0];
-		return Sphere_intersection(model, l);
+		return Sphere_intersection(model, ray);
 	}
-	double linePointDistance = Line_Point_distance(l, model->center);
+	double linePointDistance = Line_Point_distance(ray, model->center);
 	if(linePointDistance > model->maxDistanceFromCenter){
 		return NULL;
 	}
 
-	Point *q = Line_projectionPoint(l, model->center);
-	Vector pq = Vector_fromPoints(l->p, q);
-	if(Vector_dot(pq, *l->v) + model->maxDistanceFromCenter < 0){
+	Point *q = Line_projectionPoint(ray, model->center);
+	Vector pq = Vector_fromPoints(ray->origin, q);
+	if(Vector_dot(pq, ray->direction) + model->maxDistanceFromCenter < 0){
 		return NULL;
 	}
 
 	Point *intersection = NULL;
 	double minDistance = -1;
 	for(int i = 0; i < model->numTriangles; i++){
-		Point *p = intersectionPoint(l, model->triangles[i]);
+		Point *p = intersectionPoint(ray, model->triangles[i]);
 		if(p != NULL){
-			double distance = Point_distanceSquared(l->p, p);
+			double distance = Point_distanceSquared(ray->origin, p);
 			if(minDistance == -1 || distance < minDistance){
 				intersection = p;
 				*p_t = model->triangles[i];

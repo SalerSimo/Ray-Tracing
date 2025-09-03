@@ -9,6 +9,8 @@
 #define MAX_DEPTH 3
 #define BACKGROUND_COLOR Color_new(0xA7ECFF)
 
+typedef Line Ray;
+
 /**
  * Traces a single ray in the scene and returns the resulting color.
  *

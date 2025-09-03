@@ -95,25 +95,20 @@ double Point_distanceSquared(Point *a, Point *b){
 	return pow(a->x - b->x, 2) + pow(a->y - b->y, 2) + pow(a->z - b->z, 2);
 }
 
-Line *Line_init(Point *p, Vector *v){
+Line *Line_init(Point *origin, Vector direction){
 	Line *l = malloc(sizeof(Line));
 	if(l == NULL) return NULL;
-	l->p = p;
-	l->v = v;
+	l->origin = origin;
+	l->direction = Vector_normalize(direction);
 	return l;
 }
 
-void Line_print(Line *l){
-	printf("%.2f   %.2f*t\n", l->p->x, l->v->x);
-	printf("%.2f + %.2f*t\n", l->p->y, l->v->y);
-	printf("%.2f   %.2f*t\n", l->p->z, l->v->z);
-}
 
 double Line_Point_distance(Line *l, Point *p){
-	Vector p0p1 = Vector_fromPoints(l->p, p);
+	Vector p0p1 = Vector_fromPoints(l->origin, p);
 
-	Vector v =  Vector_crossProduct(*l->v, p0p1);
-	Vector n = Vector_crossProduct(*l->v, v);
+	Vector v =  Vector_crossProduct(l->direction, p0p1);
+	Vector n = Vector_crossProduct(l->direction, v);
 
 	double distance = abs(Vector_dot(p0p1, n)) / sqrt(n.normSquared);
 	return distance;
@@ -125,6 +120,7 @@ Plane *Plane_new(double A, double B, double C, double D){
 	plane->B = B;
 	plane->C = C;
 	plane->D = D;
+	return plane;
 }
 
 Vector Plane_vectorNormal(Plane *plane){
@@ -132,11 +128,7 @@ Vector Plane_vectorNormal(Plane *plane){
 }
 
 Point *Line_projectionPoint(Line *l, Point *p){
-	Vector v = Vector_fromPoints(l->p, p);
-	double scale = Vector_dot(v, *l->v) / l->v->normSquared;
-	return Point_init(
-		l->p->x + scale*l->v->x,
-		l->p->y + scale*l->v->y,
-		l->p->z + scale*l->v->z
-	);
+	Vector v = Vector_fromPoints(l->origin, p);
+	double scale = Vector_dot(v, l->direction) / l->direction.normSquared;
+	return Point_translate(l->origin, Vector_scale(l->direction, scale));
 }
