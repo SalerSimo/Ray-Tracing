@@ -7,5 +7,6 @@
 #include"raytracer.h"
 #include"scene.h"
 #include"objloader.h"
+#include"camera.h"
 
 #endif

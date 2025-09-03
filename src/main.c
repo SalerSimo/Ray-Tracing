@@ -27,32 +27,26 @@ void Display(Scene *scene, SDL_Window *window, int nThread, bool verbose, int an
 Color GetPixelColor(double i, double j, ThreadData *data){
     Point *p;
     Scene *scene = data->scene;
-    Point *camera = scene->camera;
     SDL_Surface *surface = data->surface;
-    double distance = 1;
     int factor = data->antiAliasingFactor;
     double aspectRatio = (double)surface->h / surface->w;
 
-    double fieldOfView = scene->fieldOfView;
-    double viewportWidth = 2 * distance * tan(fieldOfView / 2);
+    double viewportWidth = 2 * tan(scene->camera->fov / 2);
     double viewportHeight = viewportWidth * aspectRatio;
 
     int width = surface->w*factor;
     int height = surface->h*factor;
 
-    double alpha = scene->rotationAngle;
+    float dx = ((i + 0.5)/width - 0.5) * viewportWidth;
+	float dy = (0.5 - (j + 0.5)/height) * viewportHeight;
 
-    double x, y, z;
-    x = -viewportWidth / 2 + viewportWidth*(i+0.5)/width;
-    y = camera->y + viewportHeight/2 - viewportHeight*(j+0.5)/height;
-    z = -distance;
-    double rotatedX = camera->x + z*sin(alpha) + x*cos(alpha);
-    double rotatedZ = camera->z + z*cos(alpha) - x*sin(alpha);
-    
-    p = Point_init(rotatedX, y, rotatedZ);
+    Point *pixelPosition = scene->camera->position;
+    pixelPosition = Point_translate(pixelPosition, scene->camera->front);
+    pixelPosition = Point_translate(pixelPosition, Vector_scale(scene->camera->right, dx));
+    pixelPosition = Point_translate(pixelPosition, Vector_scale(scene->camera->up, dy));
 
-    Vector direction = Vector_normalize(Vector_fromPoints(camera, p));
-    Line *l = Line_init(camera, &direction);
+    Vector direction = Vector_normalize(Vector_fromPoints(scene->camera->position, pixelPosition));
+    Line *l = Line_init(scene->camera->position, &direction);
 
     return TraceRay(scene, l);
 }
@@ -117,10 +111,9 @@ void *thread_function(void *args){
 }
 
 Scene *CreateScene(int numObj, char **objs){
-    Point *camera = Point_init(0, 0, 20);
-
-    double fieldOfView = 90 * M_PI / 180;
-    Scene *scene = Scene_init(camera, fieldOfView);    
+    double fov = 90 * M_PI / 180;
+    Camera *camera = Camera_new(Point_init(0, 0, 20), Vector_init(0, 0, -1), Vector_init(0, 1, 0), fov);
+    Scene *scene = Scene_init(camera);
     
     double floorY = -10;
     Model *floor = Model_createRectXZ(Point_init(-500, floorY, -500), 1000, 1000, 0, 0, COLOR_BLUE);
@@ -177,49 +170,43 @@ void SimulateScene(Scene *scene, SDL_Window *window, int antiAliasingFactor){
             }
             else if(event.type == SDL_EVENT_KEY_DOWN){
                 SDL_Keycode key = event.key.key;
-                double moveStep = 4;
-                double deltaX = 0, deltaZ = 0, deltaY = 0;
-                double angle = scene->rotationAngle;
-                double angleStep = 0;
+                bool display = true;
+
                 switch(key){
+                    case SDLK_ESCAPE:
+                        return;
+                        break;
                     case SDLK_W:
-                        deltaZ = -moveStep*cos(angle);
-                        deltaX = -moveStep*sin(angle);
+                        Camera_ProcessMovement(scene->camera, CAMERA_MOVEMENT_FORWARD);
                         break;
                     case SDLK_S:
-                        deltaZ = moveStep*cos(angle);
-                        deltaX = moveStep*sin(angle);
+                        Camera_ProcessMovement(scene->camera, CAMERA_MOVEMENT_BACKWARD);
                         break;
                     case SDLK_D:
-                        deltaZ = -moveStep*sin(angle);
-                        deltaX = moveStep*cos(angle);
+                        Camera_ProcessMovement(scene->camera, CAMERA_MOVEMENT_RIGHT);
                         break;
                     case SDLK_A:
-                        deltaZ = moveStep*sin(angle);
-                        deltaX = -moveStep*cos(angle);
+                        Camera_ProcessMovement(scene->camera, CAMERA_MOVEMENT_LEFT);
                         break;
                     case SDLK_R:
-                        deltaY = 2;
+                        Camera_ProcessMovement(scene->camera, CAMERA_MOVEMENT_UP);
                         break;
                     case SDLK_F:
-                        deltaY = -2;
+                        Camera_ProcessMovement(scene->camera, CAMERA_MOVEMENT_DOWN);
                         break;
                     case SDLK_Q:
-                        angleStep = 10 * M_PI / 180;
+                        Camera_ProcessMovement(scene->camera, CAMERA_MOVEMENT_ROTATE_LEFT);
                         break;
                     case SDLK_E:
-                        angleStep = -10 * M_PI / 180;
+                        Camera_ProcessMovement(scene->camera, CAMERA_MOVEMENT_ROTATE_RIGHT);
                         break;
                     default:
+                        display = false;
                         break;
                 }
-                for(int i = 0; i < numFrame; i++){
-                    scene->camera->x += deltaX / numFrame;
-                    scene->camera->z += deltaZ / numFrame;
-                    scene->camera->y += deltaY / numFrame;
-                    scene->rotationAngle += angleStep / numFrame;
+
+                if(display)
                     Display(scene, window, nThread, 0, antiAliasingFactor);
-                }
             }
         }
         SDL_Delay(50);

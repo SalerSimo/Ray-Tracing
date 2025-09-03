@@ -1,15 +1,12 @@
 #include"scene.h"
 #include<math.h>
 
-Scene *Scene_init(Point *camera, double fieldOfView){
+Scene *Scene_init(Camera *camera){
     Scene *s = malloc(sizeof(Scene*));
     if(s == NULL) return NULL;
     s->numModels = 0;
-    s->models = NULL;
-    s->rotationAngle = 0;
+    s->models = NULL;;
     s->camera = camera;
-    if(fieldOfView < 0 || fieldOfView >= M_PI) s->fieldOfView = 90 * M_PI / 180;
-    else s->fieldOfView = fieldOfView;
     s->lightSource = NULL;
     return s;
 }
