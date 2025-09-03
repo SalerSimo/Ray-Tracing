@@ -13,6 +13,10 @@ Color TraceRay(Scene *scene, Ray *ray){
 	return TraceRayR(scene, ray, 0);
 }
 
+Vector Reflect(Vector incident, Vector normal) {
+	return Vector_sum(incident, Vector_scale(normal, -2 * Vector_dot(incident, normal)));
+}
+
 int isInShadow(Scene *scene, Model *nearModel, Point *intersectionPoint, Point *lightPoint){
 	Vector toLight =  Vector_fromPoints(intersectionPoint, lightPoint);
 	Ray *shadowRay = Line_init(intersectionPoint, toLight);
@@ -133,14 +137,12 @@ Color TraceRayR(Scene *scene, Ray *ray, int depth){
 	Color specularColor = Color_scale(COLOR_WHITE, specularStrength * spec * shadowFactor);
 
 	if (nearModel->reflexivity > 0 && depth < MAX_DEPTH) {
-		Vector dir = Vector_normalize(ray->direction);
-		Vector tang = Vector_scale(normal, -2 * Vector_dot(normal, dir));
-		Vector reflex = Vector_sum(dir, tang);
+		Vector reflex = Reflect(ray->direction, normal);
 		double epsilon = 1e-5;
 		Vector delta = Vector_scale(normal, epsilon);
 
-		Line *reflexLine = Line_init(Point_translate(intersectionPoint, delta), reflex);
-		Color reflectedColor = TraceRayR(scene, reflexLine, depth + 1);
+		Ray *reflexRay = Line_init(Point_translate(intersectionPoint, delta), reflex);
+		Color reflectedColor = TraceRayR(scene, reflexRay, depth + 1);
 		reflectedColor = Color_scale(reflectedColor, 0.95); // a model cannot reflect 100% of the light it absorbs
 		diffuseColor = Color_blend(diffuseColor, reflectedColor, nearModel->reflexivity);
 	}
@@ -192,14 +194,12 @@ Point *intersectionPoint(Ray *ray, Triangle *t){
 }
 
 Point *Sphere_intersection(Model *sphere, Ray *ray) {
-	//if(sphere->type != SPHERE) return NULL;
 	Point *O = ray->origin;
 	Vector D = ray->direction;
-	Point *C = sphere->center; // Sphere center
+	Point *C = sphere->center;
 	double r = sphere->maxDistanceFromCenter;
 
-	// Vector L = O - C
-	Vector L = Vector_init(O->x - C->x, O->y - C->y, O->z - C->z);
+	Vector L = Vector_fromPoints(C, O);
 
 	// Compute a, b, c
 	double a = Vector_dot(D, D);
@@ -223,11 +223,7 @@ Point *Sphere_intersection(Model *sphere, Ray *ray) {
 	else return NULL; // Both intersections are behind the camera
 
 	// Compute intersection point: P = O + t * D
-	Point *intersection = Point_init(
-		O->x + t * D.x,
-		O->y + t * D.y,
-		O->z + t * D.z
-	);
+	Point* intersection = Point_translate(O, Vector_scale(D, t));
 
 	return intersection;
 }
