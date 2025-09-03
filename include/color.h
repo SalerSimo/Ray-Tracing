@@ -19,7 +19,7 @@
 #define COLOR_LIME     Color_new(0x00FF00)
 
 typedef struct{
-    uint32_t color;
+	uint32_t color;
 }Color;
 
 /**

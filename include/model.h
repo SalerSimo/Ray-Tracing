@@ -9,12 +9,12 @@
 #define LON_DIVS 20
 
 typedef struct{
-    Point *a, *b, *c;
-    Color color;
+	Point *a, *b, *c;
+	Color color;
 }Triangle;
 
 typedef enum{
-    GENERIC, SPHERE, LIGHT
+	GENERIC, SPHERE, LIGHT
 }ModelType;
 
 /**
@@ -25,22 +25,22 @@ typedef enum{
  * center point and a bounding radius for optimization (e.g., bounding sphere tests).
  */
 typedef struct{
-    /** Number of triangles of the model. */
-    int numTriangles;
-    /** Array of pointers to Triangle structure. */
-    Triangle **triangles;
-    /** Center of the model. */
-    Point *center;
-    /** Color of the model. */
-    Color color;
-    /** Maximum distance from the center to any point on the model (bounding radius). */
-    double maxDistanceFromCenter;
-    /** Model reflection coefficient (0 = no reflection, 1 = perfect mirror). */
-    double reflexivity;
-    /** Model shininess (0 = fully rough, 1 = fully smooth). */
-    double shininess;
-    /** Type of model. */
-    ModelType type;
+	/** Number of triangles of the model. */
+	int numTriangles;
+	/** Array of pointers to Triangle structure. */
+	Triangle **triangles;
+	/** Center of the model. */
+	Point *center;
+	/** Color of the model. */
+	Color color;
+	/** Maximum distance from the center to any point on the model (bounding radius). */
+	double maxDistanceFromCenter;
+	/** Model reflection coefficient (0 = no reflection, 1 = perfect mirror). */
+	double reflexivity;
+	/** Model shininess (0 = fully rough, 1 = fully smooth). */
+	double shininess;
+	/** Type of model. */
+	ModelType type;
 }Model;
 
 

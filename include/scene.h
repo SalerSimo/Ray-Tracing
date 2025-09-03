@@ -9,11 +9,11 @@
 #include"camera.h"
 
 typedef struct{
-    Point *position;
-    double radius;
-    Color color;
+	Point *position;
+	double radius;
+	Color color;
 
-    double constant, linear, quadratic;
+	double constant, linear, quadratic;
 }Light;
 
 /**
@@ -23,14 +23,14 @@ typedef struct{
  * It also includes camera-related properties like the viewing distance and rotation angle.
  */
 typedef struct{
-    /** Pointer to the camera object in the scene */
-    Camera *camera;
-    /** Array of pointers to the models in the scene. */
-    Model **models;
-    /** Number of models in the scene. */
-    unsigned int numModels;
-    /** Pointer to the light source of the scene. */
-    Light *lightSource;
+	/** Pointer to the camera object in the scene */
+	Camera *camera;
+	/** Array of pointers to the models in the scene. */
+	Model **models;
+	/** Number of models in the scene. */
+	unsigned int numModels;
+	/** Pointer to the light source of the scene. */
+	Light *lightSource;
 }Scene;
 
 

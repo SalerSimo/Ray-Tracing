@@ -2,21 +2,21 @@
 #define GEOMETRY_H
 
 typedef struct{
-    double x, y, z;
-    double normSquared;
+	double x, y, z;
+	double normSquared;
 }Vector;
 
 typedef struct{
-    double x, y, z;
+	double x, y, z;
 }Point;
 
 typedef struct{
-    Point *p;
-    Vector *v;
+	Point *p;
+	Vector *v;
 }Line;
 
 typedef struct{
-    double A, B, C, D;
+	double A, B, C, D;
 }Plane;
 
 
