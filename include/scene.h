@@ -69,7 +69,14 @@ void Scene_fill(Scene *s, Light *lightSource, Model **models, int numModels);
  */
 void Scene_addModels(Scene *s, Model **models, int numModels);
 
+/**
+ * @brief Sort models in a scene based on the distance between the model center and the camera position
+ */
+void Scene_sortModels(Scene *s);
+
 
 Light *Light_new(Point *position, double radius, Color lightColor);
+
+void Light_setAttenuation(Light *light, double constant, double linear, double quadratic);
 
 #endif //SCENE_H
