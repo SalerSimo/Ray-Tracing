@@ -94,6 +94,9 @@ Color TraceRayR(Scene *scene, Ray *ray, int depth){
 
 	for(int i = 0; i < scene->numModels; i++){
 		if(scene->models[i] == NULL) continue;
+		if(intersectionPoint != NULL && Vector_dot(Vector_fromPoints(scene->models[i]->center, intersectionPoint), ray->direction) < 0 && Point_distanceSquared(scene->models[i]->center, intersectionPoint) > scene->models[i]->maxDistanceFromCenter * scene->models[i]->maxDistanceFromCenter){
+			continue;
+		}
 		Point *p = Model_intersection(scene->models[i], ray, &t);
 		if(p != NULL){
 			double distance = Point_distanceSquared(ray->origin, p);
