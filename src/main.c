@@ -149,7 +149,9 @@ Scene *CreateScene(int numObj, char **objs){
 		objects[i] = Model_fromOBJ(objs[i]);
 	}
 
-	Scene_addModels(scene, objects, numObj);
+	for(int i = 0; i < scene->numModels; i++){
+		Model_sortTriangles(scene->models[i], scene->camera->position);
+	}
 
 	return scene;
 }

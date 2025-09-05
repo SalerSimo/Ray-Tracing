@@ -136,6 +136,14 @@ void Model_translate(Model *model, Vector translation);
 void Model_scale(Model *model, double scalar);
 
 /**
+ * @brief Sorts the triangles of a model by their distance to a reference point.
+ *
+ * @param model Pointer to the model whose triangles will be sorted.
+ * @param point Reference point used to calculate distances.
+ */
+void Model_sortTriangles(Model *model, Point *point);
+
+/**
  * Computes and returns the model normal of a triangle.
  * The normal is calculated using the cross product of two edges of the triangle,
  * and is normalized to 1 unit length.

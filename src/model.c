@@ -289,3 +289,33 @@ void Model_scale(Model *model, double scalar){
 		t->c->z = model->center->z + v.z;
 	}
 }
+
+Point *Triangle_center(Triangle *t){
+	Point *center = Point_init(0, 0, 0);
+	center->x = (t->a->x + t->b->x + t->c->x) / 3;
+	center->y = (t->a->y + t->b->y + t->c->y) / 3;
+	center->z = (t->a->z + t->b->z + t->c->z) / 3;
+
+	return center;
+}
+
+static Point *g_refPoint;
+
+int compareTriangles(const void *a, const void *b) {
+	Triangle *t1 = *(Triangle **)a;
+	Triangle *t2 = *(Triangle **)b;
+
+	double d1 = Point_distanceSquared(g_refPoint, Triangle_center(t1));
+	double d2 = Point_distanceSquared(g_refPoint, Triangle_center(t2));
+
+	if (d1 < d2) return -1;
+	else if (d1 > d2) return 1;
+	else return 0;
+}
+
+void Model_sortTriangles(Model *model, Point *point){
+	if(model == NULL || point == NULL) return;
+	if(model->triangles == NULL) return;
+	g_refPoint = point;
+	qsort(model->triangles, model->numTriangles, sizeof(Triangle*), compareTriangles);
+}

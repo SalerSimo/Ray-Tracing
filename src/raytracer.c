@@ -1,5 +1,6 @@
 #include<stdlib.h>
 #include<math.h>
+#include<stdbool.h>
 #include"raytracer.h"
 
 #define SHADOW_SAMPLES 20
@@ -13,7 +14,7 @@ typedef struct{
 }Hit;
 
 
-Hit Model_intersection(Model *model, Ray *l);
+Hit Model_intersection(Model *model, Ray *l, bool triangleSorted);
 Color TraceRayR(Scene *scene, Ray *l, int depth);
 
 Color TraceRay(Scene *scene, Ray *ray){
@@ -29,7 +30,7 @@ int isInShadow(Scene *scene, Hit realHit, Point *lightPoint){
 	Ray *shadowRay = Line_init(realHit.point, toLight);
 	for (int i = 0; i < scene->numModels; i++) {
 		if (scene->models[i] == realHit.model || scene->models[i] == NULL || scene->models[i]->type == LIGHT) continue;
-		Hit hit = Model_intersection(scene->models[i], shadowRay);
+		Hit hit = Model_intersection(scene->models[i], shadowRay, false);
 		if (hit.point != NULL) {
 			double distToObj = Point_distanceSquared(hit.point, realHit.point);
 			double distToLight = Point_distanceSquared(lightPoint, hit.point);
@@ -100,7 +101,9 @@ Color TraceRayR(Scene *scene, Ray *ray, int depth){
 		if(realHit.point != NULL && Vector_dot(Vector_fromPoints(scene->models[i]->center, realHit.point), ray->direction) < 0 && Point_distanceSquared(scene->models[i]->center, realHit.point) > scene->models[i]->maxDistanceFromCenter * scene->models[i]->maxDistanceFromCenter){
 			continue;
 		}
-		Hit currentHit = Model_intersection(scene->models[i], ray);
+		bool sorted = false;
+		if(depth == 0) sorted = true;
+		Hit currentHit = Model_intersection(scene->models[i], ray, sorted);
 		if(currentHit.point != NULL){
 			double distance = Point_distanceSquared(ray->origin, currentHit.point);
 			if(minDistance == -1 || distance < minDistance){
@@ -238,7 +241,7 @@ Hit Sphere_intersection(Model *sphere, Ray *ray) {
 	return hit;
 }
 
-Hit Model_intersection(Model *model, Ray *ray){
+Hit Model_intersection(Model *model, Ray *ray, bool triangleSorted){
 	if(model->type == SPHERE || model->type == LIGHT){
 		return Sphere_intersection(model, ray);
 	}
@@ -266,6 +269,7 @@ Hit Model_intersection(Model *model, Ray *ray){
 				intersection = p;
 				hitTriangle = model->triangles[i];
 				minDistance = distance;
+				if(triangleSorted) break;
 			}
 		}
 	}
