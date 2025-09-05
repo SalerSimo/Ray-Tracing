@@ -223,12 +223,12 @@ void SimulateScene(Scene *scene, SDL_Window *window, int antiAliasingFactor){
 
 SDL_Window* InitWindow(){
 	if (SDL_Init(SDL_INIT_VIDEO) == 0) {
-		printf("SDL_Init Error: %s\n", SDL_GetError());
+		printf("ERROR::SDL::Init:%s\n", SDL_GetError());
 		return NULL;
 	}
 	SDL_Window* window = SDL_CreateWindow("RayTracing", WIDTH, HEIGHT, SDL_WINDOW_RESIZABLE);
 	if (window == NULL) {
-		printf("SDL_CreateWindow Error: %s\n", SDL_GetError());
+		printf("ERROR::SDL::CreateWindow::%s\n", SDL_GetError());
 		SDL_Quit();
 		return NULL;
 	}

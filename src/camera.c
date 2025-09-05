@@ -8,7 +8,7 @@ double angleStep = 15 * M_PI / 180;
 
 Camera* Camera_new(Point *position, Vector front, Vector up, double fov){
       if(Vector_dot(front, up) != 0){
-            printf("Front and Up direction must be perpendicular\n");
+            printf("ERROR::CAMERA::Front and Up direction must be perpendicular\n");
             return NULL;
       }
 
