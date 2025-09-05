@@ -9,6 +9,12 @@
 #define LON_DIVS 20
 
 typedef struct{
+	Color color;
+	double reflexivity;
+	double shininess;
+}Material;
+
+typedef struct{
 	Point *a, *b, *c;
 	Color color;
 }Triangle;
