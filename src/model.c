@@ -338,11 +338,7 @@ size_t Triangle_size(Triangle *t){
 }
 
 size_t Material_size(Material material){
-	size_t size = 0;
-	size += Color_size(material.color);
-	size += sizeof(material.reflexivity);
-	size += sizeof(material.shininess);
-	return size;
+	return sizeof(material);
 }
 
 size_t Model_size(Model *model){
