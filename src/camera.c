@@ -3,10 +3,10 @@
 #include<stdlib.h>
 #include<math.h>
 
-double moveStep = 4;
-double angleStep = 15 * M_PI / 180;
+float moveStep = 4;
+float angleStep = 15 * M_PI / 180;
 
-Camera* Camera_new(Point *position, Vector front, Vector up, double fov){
+Camera* Camera_new(Point *position, Vector front, Vector up, float fov){
       if(Vector_dot(front, up) != 0){
             printf("ERROR::CAMERA::Front and Up direction must be perpendicular\n");
             return NULL;

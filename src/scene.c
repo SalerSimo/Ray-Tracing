@@ -67,7 +67,7 @@ void Scene_sortModels(Scene *s){
 	}
 }
 
-Light *Light_new(Point *position, double radius, Color lightColor){
+Light *Light_new(Point *position, float radius, Color lightColor){
 	Light *light = malloc(sizeof(Light));
 	light->position = position;
 	light->radius = radius;
@@ -79,7 +79,7 @@ Light *Light_new(Point *position, double radius, Color lightColor){
 	return light;
 }
 
-void Light_setAttenuation(Light *light, double constant, double linear, double quadratic){
+void Light_setAttenuation(Light *light, float constant, float linear, float quadratic){
 	if(light == NULL) return;
 	light->constant = constant;
 	light->linear = linear;

@@ -18,10 +18,10 @@ typedef struct{
       Vector up;
       Vector right;
 
-      double fov;
+      float fov;
 }Camera;
 
-Camera* Camera_new(Point *position, Vector front, Vector up, double fov);
+Camera* Camera_new(Point *position, Vector front, Vector up, float fov);
 
 void Camera_ProcessMovement(Camera *camera, CameraMovement movement);
 

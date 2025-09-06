@@ -24,15 +24,15 @@ typedef struct{
 
 void Display(Scene *scene, SDL_Window *window, int nThread, bool verbose, int antiAliasingFactor);
 
-Color GetPixelColor(double i, double j, ThreadData *data){
+Color GetPixelColor(float i, float j, ThreadData *data){
 	Point *p;
 	Scene *scene = data->scene;
 	SDL_Surface *surface = data->surface;
 	int factor = data->antiAliasingFactor;
-	double aspectRatio = (double)surface->h / surface->w;
+	float aspectRatio = (float)surface->h / surface->w;
 
-	double viewportWidth = 2 * tan(scene->camera->fov / 2);
-	double viewportHeight = viewportWidth * aspectRatio;
+	float viewportWidth = 2 * tan(scene->camera->fov / 2);
+	float viewportHeight = viewportWidth * aspectRatio;
 
 	int width = surface->w*factor;
 	int height = surface->h*factor;
@@ -111,17 +111,17 @@ void *thread_function(void *args){
 }
 
 Scene *CreateScene(int numObj, char **objs){
-	double fov = 90 * M_PI / 180;
+	float fov = 90 * M_PI / 180;
 	Camera *camera = Camera_new(Point_init(0, 0, 20), Vector_init(0, 0, -1), Vector_init(0, 1, 0), fov);
 	Scene *scene = Scene_init(camera);
 	
-	double floorY = -10;
+	float floorY = -10;
 	Model *floor = Model_createRectXZ(Point_init(-500, floorY, -500), 1000, 1000, 0, 0, COLOR_BLUE);
 
 	int numSphere = 8;
 	Model **spheres = malloc(numSphere * sizeof(Model*));
 
-	double radius = 10;
+	float radius = 10;
 	spheres[0] = Model_createSphere(Point_init(10, floorY+radius, -20), radius, 1, 0.5, COLOR_GREEN);
 	radius = 3;
 	spheres[1] = Model_createSphere(Point_init(-5, floorY+radius, -10), radius, 0, 0, COLOR_RED);
@@ -311,6 +311,6 @@ void Display(Scene *scene, SDL_Window *window, int nThread, bool verbose, int an
 
 	SDL_UpdateWindowSurface(window);
 	clock_t end = clock();
-	double time = (double)(end - start) / CLOCKS_PER_SEC * 1000;
+	float time = (float)(end - start) / CLOCKS_PER_SEC * 1000;
 	if(verbose) printf("Display took %.0f ms\n", time);
 }

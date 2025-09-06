@@ -8,7 +8,7 @@ Color Color_new(uint32_t color){
 	return c;
 }
 
-Color Color_fromRGB(double r, double g, double b){
+Color Color_fromRGB(float r, float g, float b){
 	Color c;
 
 	int red   = (int)(r * 255.0 + 0.5);
@@ -23,7 +23,7 @@ Color Color_fromRGB(double r, double g, double b){
 	return c;
 }
 
-Color Color_scale(Color c, double factor){
+Color Color_scale(Color c, float factor){
 	if(factor <= 0)
 		return COLOR_BLACK;
 	else if(factor >= 1)
@@ -45,7 +45,7 @@ Color Color_scale(Color c, double factor){
 	return c;
 }
 
-Color Color_blend(Color c1, Color c2, double t){
+Color Color_blend(Color c1, Color c2, float t){
 	if(t <= 0)
 		return c1;
 	else if(t >= 1)

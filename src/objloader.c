@@ -27,7 +27,7 @@ int LoadColors(char *fileName, char ***names, Color **color) {
 	char **colorNames = malloc(colorCapacity * sizeof(char*));
 
 	char *currentName = NULL;
-	double r, g, b;
+	float r, g, b;
 	int hasColor = 0;
 
 	while (fgets(line, sizeof(line), file)) {
@@ -99,8 +99,8 @@ Model* Model_fromOBJ(const char *fileName) {
 	int actualMaterial = 0;
 	while (fgets(line, sizeof(line), file)) {
 		if (line[0] == 'v' && line[1] == ' ') {
-			double x, y, z;
-			sscanf(line + 2, "%lf %lf %lf", &x, &y, &z);
+			float x, y, z;
+			sscanf(line + 2, "%f %f %f", &x, &y, &z);
 			if (pointCount >= pointCapacity) {
 				pointCapacity *= 2;
 				points = realloc(points, sizeof(Point*) * pointCapacity);
@@ -167,9 +167,9 @@ Model* Model_fromOBJ(const char *fileName) {
 	center->y /= pointCount;
 	center->z /= pointCount;
 
-	double maxDist = 0;
+	float maxDist = 0;
 	for (int i = 0; i < pointCount; i++) {
-		double d = Point_distanceSquared(center, points[i]);
+		float d = Point_distanceSquared(center, points[i]);
 		if (d > maxDist) maxDist = d;
 	}
 

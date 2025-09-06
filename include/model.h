@@ -15,9 +15,9 @@ typedef struct{
 	/** Color of the material. */
 	Color color;
 	/** Model reflection coefficient (0 = no reflection, 1 = perfect mirror). */
-	double reflexivity;
+	float reflexivity;
 	/** Model shininess (0 = fully rough, 1 = fully smooth). */
-	double shininess;
+	float shininess;
 }Material;
 
 typedef struct{
@@ -49,7 +49,7 @@ typedef struct{
 	/** Center of the model. */
 	Point *center;
 	/** Maximum distance from the center to any point on the model (bounding radius). */
-	double maxDistanceFromCenter;
+	float maxDistanceFromCenter;
 	/** Type of model. */
 	ModelType type;
 }Model;
@@ -68,7 +68,7 @@ typedef struct{
  * @return Pointer to the newly created Model representing the rectangle,
  *         or NULL if memory allocation fails.
  */
-Model *Model_createRectXY(Point *origin, double width, double height, double reflexivity, double shininess, Color color);
+Model *Model_createRectXY(Point *origin, float width, float height, float reflexivity, float shininess, Color color);
 
 /**
  * Creates a rectangular model aligned to the X-Z plane.
@@ -83,7 +83,7 @@ Model *Model_createRectXY(Point *origin, double width, double height, double ref
  * @return Pointer to the allocated Model representing the rectangle,
  *         or NULL if memory allocation fails.
  */
-Model *Model_createRectXZ(Point *origin, double width, double height, double reflexivity, double shininess, Color color);
+Model *Model_createRectXZ(Point *origin, float width, float height, float reflexivity, float shininess, Color color);
 
 /**
  * Creates a rectangular model aligned to the Y-Z plane.
@@ -98,7 +98,7 @@ Model *Model_createRectXZ(Point *origin, double width, double height, double ref
  * @return Pointer to the allocated Model representing the rectangle,
  *         or NULL if memory allocation fails.
  */
-Model *Model_createRectYZ(Point *origin, double width, double height, double reflexivity, double shininess, Color color);
+Model *Model_createRectYZ(Point *origin, float width, float height, float reflexivity, float shininess, Color color);
 
 /**
  * Creates a 3D box-shaped Model object.
@@ -114,7 +114,7 @@ Model *Model_createRectYZ(Point *origin, double width, double height, double ref
  * @return Pointer to the allocated Model representing the box 
  *         or NULL if allocation fails.
  */
-Model *Model_createBox(Point *origin, double width, double height, double depth, double reflexivity, double shininess, Color color);
+Model *Model_createBox(Point *origin, float width, float height, float depth, float reflexivity, float shininess, Color color);
 
 /**
  * Creates a spherical model centered at the given point.
@@ -128,7 +128,7 @@ Model *Model_createBox(Point *origin, double width, double height, double depth,
  * @return Pointer to the allocated Model representing the sphere 
  *         or NULL if allocation fails.
  */
-Model *Model_createSphere(Point *center, double radius, double reflexivity, double shininess, Color color);
+Model *Model_createSphere(Point *center, float radius, float reflexivity, float shininess, Color color);
 
 /**
  * @brief Translates all vertices of the Model by a given vector.
@@ -144,7 +144,7 @@ void Model_translate(Model *model, Vector translation);
  * @param model Pointer to the model to scale.
  * @param scalar The factor to scale the model with.
  */
-void Model_scale(Model *model, double scalar);
+void Model_scale(Model *model, float scalar);
 
 /**
  * @brief Sorts the triangles of a model by their distance to a reference point.

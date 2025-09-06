@@ -3,7 +3,7 @@
 #include<math.h>
 #include"geometry.h"
 
-Vector Vector_init(double x, double y, double z){
+Vector Vector_init(float x, float y, float z){
 	Vector v;
 	v.x = x;
 	v.y = y;
@@ -18,7 +18,7 @@ Vector Vector_fromPoints(Point *a, Point *b){
 
 Vector Vector_normalize(Vector v){
 	Vector vNorm = Vector_init(v.x, v.y, v.z);
-	double norm = sqrt(vNorm.normSquared);
+	float norm = sqrt(vNorm.normSquared);
 	vNorm.x /= norm;
 	vNorm.y /= norm;
 	vNorm.z /= norm;
@@ -26,7 +26,7 @@ Vector Vector_normalize(Vector v){
 	return vNorm;
 }
 
-Vector Vector_scale(Vector v, double scalar){
+Vector Vector_scale(Vector v, float scalar){
 	return Vector_init(v.x * scalar, v.y * scalar, v.z * scalar);
 }
 
@@ -35,14 +35,14 @@ Vector Vector_sum(Vector v1, Vector v2){
 }
 
 Vector Vector_crossProduct(Vector a, Vector b){
-	double x, y, z;
+	float x, y, z;
 	x = a.y * b.z - a.z * b.y;
 	y = a.z * b.x - a.x * b.z;
 	z = a.x * b.y - a.y * b.x;
 	return Vector_init(x, y, z);
 }
 
-double Vector_dot(Vector v1, Vector v2){
+float Vector_dot(Vector v1, Vector v2){
 	return v1.x*v2.x + v1.y*v2.y + v1.z*v2.z; 
 }
 
@@ -54,7 +54,7 @@ Vector Vector_perpendicular(Vector v){
 	return Vector_crossProduct(v, e);
 }
 
-Vector Vector_rotate(Vector v, Vector axis, double angle){
+Vector Vector_rotate(Vector v, Vector axis, float angle){
 	Vector rotated1, rotated2;
 	axis = Vector_normalize(axis);
 	rotated1 = Vector_scale(v, cos(angle));
@@ -74,7 +74,7 @@ void Vector_print(Vector *v){
 }
 
 
-Point *Point_init(double x, double y, double z){
+Point *Point_init(float x, float y, float z){
 	Point *p = malloc(sizeof(Point));
 	if(p == NULL) return NULL;
 	p->x = x;
@@ -91,7 +91,7 @@ void Point_print(Point *p){
 	printf("(%f, %f, %f)\n", p->x, p->y, p->z);
 }
 
-double Point_distanceSquared(Point *a, Point *b){
+float Point_distanceSquared(Point *a, Point *b){
 	return pow(a->x - b->x, 2) + pow(a->y - b->y, 2) + pow(a->z - b->z, 2);
 }
 
@@ -104,17 +104,17 @@ Line *Line_init(Point *origin, Vector direction){
 }
 
 
-double Line_Point_distance(Line *l, Point *p){
+float Line_Point_distance(Line *l, Point *p){
 	Vector p0p1 = Vector_fromPoints(l->origin, p);
 
 	Vector v =  Vector_crossProduct(l->direction, p0p1);
 	Vector n = Vector_crossProduct(l->direction, v);
 
-	double distance = abs(Vector_dot(p0p1, n)) / sqrt(n.normSquared);
+	float distance = abs(Vector_dot(p0p1, n)) / sqrt(n.normSquared);
 	return distance;
 }
 
-Plane *Plane_new(double A, double B, double C, double D){
+Plane *Plane_new(float A, float B, float C, float D){
 	Plane *plane = malloc(sizeof(Plane));
 	plane->A = A;
 	plane->B = B;
@@ -129,7 +129,7 @@ Vector Plane_vectorNormal(Plane *plane){
 
 Point *Line_projectionPoint(Line *l, Point *p){
 	Vector v = Vector_fromPoints(l->origin, p);
-	double scale = Vector_dot(v, l->direction) / l->direction.normSquared;
+	float scale = Vector_dot(v, l->direction) / l->direction.normSquared;
 	return Point_translate(l->origin, Vector_scale(l->direction, scale));
 }
 

@@ -10,10 +10,10 @@
 
 typedef struct{
 	Point *position;
-	double radius;
+	float radius;
 	Color color;
 
-	double constant, linear, quadratic;
+	float constant, linear, quadratic;
 }Light;
 
 /**
@@ -76,8 +76,8 @@ void Scene_sortModels(Scene *s);
 size_t Scene_size(Scene *s);
 
 
-Light *Light_new(Point *position, double radius, Color lightColor);
+Light *Light_new(Point *position, float radius, Color lightColor);
 
-void Light_setAttenuation(Light *light, double constant, double linear, double quadratic);
+void Light_setAttenuation(Light *light, float constant, float linear, float quadratic);
 
 #endif //SCENE_H

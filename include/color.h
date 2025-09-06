@@ -39,16 +39,16 @@ Color Color_new(uint32_t color);
  * 
  * @return A Color struct initialized with the specified color.
  */
-Color Color_fromRGB(double r, double g, double b);
+Color Color_fromRGB(float r, float g, float b);
 
 /**
  * Scales the brightness of a Color by a given factor.
  *
  * @param c The original Color to scale.
- * @param factor A double value between 0 and 1 used to scale the color brightness.
+ * @param factor A float value between 0 and 1 used to scale the color brightness.
  * @return A new Color with RGB components scaled by the factor.
  */
-Color Color_scale(Color c, double factor);
+Color Color_scale(Color c, float factor);
 
 /**
  * Blends two Colors based on a parameter `t`, using the logic:
@@ -60,7 +60,7 @@ Color Color_scale(Color c, double factor);
  * @param t  The interpolation factor (clamped between 0 and 1).
  * @return A new Color representing the blend of c1 and c2.
  */
-Color Color_blend(Color c1, Color c2, double t);
+Color Color_blend(Color c1, Color c2, float t);
 
 /**
  * Adds the RGB components of two Colors.

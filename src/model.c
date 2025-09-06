@@ -13,7 +13,7 @@ Triangle *Triangle_init(Point *a, Point *b, Point *c, unsigned char material){
 	return t;
 }
 
-double Triangle_area(Triangle *t){
+float Triangle_area(Triangle *t){
 	Vector ab, ac;
 	ab = Vector_fromPoints(t->a, t->b);
 	ac = Vector_fromPoints(t->a, t->c);
@@ -39,20 +39,20 @@ Model *Model_new(){
 	return model;
 }
 
-Model *Model_createSphere(Point *center, double radius, double reflexivity, double shininess, Color color){
+Model *Model_createSphere(Point *center, float radius, float reflexivity, float shininess, Color color){
 	int numPoints = (LAT_DIVS + 1) * LON_DIVS;
 	Point **points = malloc(numPoints * sizeof(Point*));
 	Model *sphere = Model_new();
 
 	int index = 0;
 	for (int i = 0; i <= LAT_DIVS; i++) {
-		double theta = M_PI * i / LAT_DIVS; // polar angle from 0 to PI
+		float theta = M_PI * i / LAT_DIVS; // polar angle from 0 to PI
 		for (int j = 0; j < LON_DIVS; j++) {
-			double phi = 2 * M_PI * j / LON_DIVS; // azimuth from 0 to 2PI
+			float phi = 2 * M_PI * j / LON_DIVS; // azimuth from 0 to 2PI
 
-			double x = center->x + radius * sin(theta) * cos(phi);
-			double y = center->y + radius * sin(theta) * sin(phi);
-			double z = center->z + radius * cos(theta);
+			float x = center->x + radius * sin(theta) * cos(phi);
+			float y = center->y + radius * sin(theta) * sin(phi);
+			float z = center->z + radius * cos(theta);
 
 			points[index++] = Point_init(x, y, z);
 		}
@@ -101,19 +101,19 @@ Model *Model_createSphere(Point *center, double radius, double reflexivity, doub
 	return sphere;
 }
 
-double Model_area(Model *model){
-	double area = 0;
+float Model_area(Model *model){
+	float area = 0;
 	for(int i = 0; i < model->numTriangles; i++){
 		area += Triangle_area(model->triangles[i]);
 	}
 	return area;
 }
 
-Model *Model_createRectXY(Point *origin, double width, double height, double reflexivity, double shininess, Color color){
+Model *Model_createRectXY(Point *origin, float width, float height, float reflexivity, float shininess, Color color){
 	Model *rect = Model_new();
 	if(rect == NULL) return NULL;
 
-	double x, y, z;
+	float x, y, z;
 	x = origin->x;
 	y = origin->y;
 	z = origin->z;
@@ -142,11 +142,11 @@ Model *Model_createRectXY(Point *origin, double width, double height, double ref
 	return rect;
 }
 
-Model *Model_createRectXZ(Point *origin, double width, double height, double reflexivity, double shininess, Color color){
+Model *Model_createRectXZ(Point *origin, float width, float height, float reflexivity, float shininess, Color color){
 	Model *rect = Model_new();
 	if(rect == NULL) return NULL;
 
-	double x, y, z;
+	float x, y, z;
 	x = origin->x;
 	y = origin->y;
 	z = origin->z;
@@ -175,11 +175,11 @@ Model *Model_createRectXZ(Point *origin, double width, double height, double ref
 	return rect;
 }
 
-Model *Model_createRectYZ(Point *origin, double width, double height, double reflexivity, double shininess, Color color){
+Model *Model_createRectYZ(Point *origin, float width, float height, float reflexivity, float shininess, Color color){
 	Model *rect = Model_new();
 	if(rect == NULL) return NULL;
 
-	double x, y, z;
+	float x, y, z;
 	x = origin->x;
 	y = origin->y;
 	z = origin->z;
@@ -208,13 +208,13 @@ Model *Model_createRectYZ(Point *origin, double width, double height, double ref
 	return rect;
 }
 
-Model *Model_createBox(Point *origin, double width, double height, double depth, double reflexivity, double shininess, Color color) {
+Model *Model_createBox(Point *origin, float width, float height, float depth, float reflexivity, float shininess, Color color) {
 	Model *box = Model_new();
 	if (box == NULL) return NULL;
 
-	double x = origin->x;
-	double y = origin->y;
-	double z = origin->z;
+	float x = origin->x;
+	float y = origin->y;
+	float z = origin->z;
 
 	Point *points[8] = {
 		Point_init(x, y, z),                               // 0: origin
@@ -272,7 +272,7 @@ void Model_translate(Model *model, Vector translation){
 	}
 }
 
-void Model_scale(Model *model, double scalar){
+void Model_scale(Model *model, float scalar){
 	if(model == NULL || scalar < 0) return;
 	model->maxDistanceFromCenter *= scalar;
 	for(int i = 0; i < model->numTriangles; i++){
@@ -314,8 +314,8 @@ int compareTriangles(const void *a, const void *b) {
 	Triangle *t1 = *(Triangle **)a;
 	Triangle *t2 = *(Triangle **)b;
 
-	double d1 = Point_distanceSquared(g_refPoint, Triangle_center(t1));
-	double d2 = Point_distanceSquared(g_refPoint, Triangle_center(t2));
+	float d1 = Point_distanceSquared(g_refPoint, Triangle_center(t1));
+	float d2 = Point_distanceSquared(g_refPoint, Triangle_center(t2));
 
 	if (d1 < d2) return -1;
 	else if (d1 > d2) return 1;

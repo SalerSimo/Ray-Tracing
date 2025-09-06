@@ -32,8 +32,8 @@ int isInShadow(Scene *scene, Hit realHit, Point *lightPoint){
 		if (scene->models[i] == realHit.model || scene->models[i] == NULL || scene->models[i]->type == LIGHT) continue;
 		Hit hit = Model_intersection(scene->models[i], shadowRay, false);
 		if (hit.point != NULL) {
-			double distToObj = Point_distanceSquared(hit.point, realHit.point);
-			double distToLight = Point_distanceSquared(lightPoint, hit.point);
+			float distToObj = Point_distanceSquared(hit.point, realHit.point);
+			float distToLight = Point_distanceSquared(lightPoint, hit.point);
 			if (distToObj < distToLight - 1e-5) {
 				return 1;
 			}
@@ -42,12 +42,12 @@ int isInShadow(Scene *scene, Hit realHit, Point *lightPoint){
 	return 0;
 }
 
-double CalculateShadowFactor(Scene *scene, Hit realHit, Vector vectorLight){
-	double epsilon = 1e-3;
+float CalculateShadowFactor(Scene *scene, Hit realHit, Vector vectorLight){
+	float epsilon = 1e-2;
 	Vector offset = Vector_scale(realHit.normal, epsilon);
 	realHit.point = Point_translate(realHit.point, offset);
 	int inShadow = 0;
-	double shadowFactor = 1;
+	float shadowFactor = 1;
 	Light *light = scene->lightSource;
 	if(light->radius > 0){
 		Vector e1 = Vector_normalize(Vector_perpendicular(vectorLight));
@@ -55,7 +55,7 @@ double CalculateShadowFactor(Scene *scene, Hit realHit, Vector vectorLight){
 
 		//check if the intersection point can be in shadow
 		int numCheck = 8;
-		double angle = 2 * M_PI / numCheck;
+		float angle = 2 * M_PI / numCheck;
 		for(int i = 0; i < numCheck; i++){
 			e1 = Vector_rotate(e1, vectorLight, angle);
 			if(isInShadow(scene, realHit, Point_translate(light->position, e1))){
@@ -68,8 +68,8 @@ double CalculateShadowFactor(Scene *scene, Hit realHit, Vector vectorLight){
 			int occluded = 0;
 			int numSamples = light->radius == 0 ? 1 : SHADOW_SAMPLES;
 			for (int s = 0; s < numSamples; s++) {
-				double theta = ((double)rand() / RAND_MAX) * 2 * M_PI;
-				double r = light->radius * sqrt((double)rand() / RAND_MAX);
+				float theta = ((float)rand() / RAND_MAX) * 2 * M_PI;
+				float r = light->radius * sqrt((float)rand() / RAND_MAX);
 
 				Vector randomTraslation = Vector_rotate(e1, vectorLight, theta);
 				randomTraslation = Vector_scale(randomTraslation, r);
@@ -78,7 +78,7 @@ double CalculateShadowFactor(Scene *scene, Hit realHit, Vector vectorLight){
 
 				occluded += isInShadow(scene, realHit, randomLightPoint);
 			}
-			shadowFactor = 1.0 - ((double)occluded / numSamples);
+			shadowFactor = 1.0 - ((float)occluded / numSamples);
 		}
 	}
 	else{
@@ -90,7 +90,7 @@ double CalculateShadowFactor(Scene *scene, Hit realHit, Vector vectorLight){
 }
 
 Color TraceRayR(Scene *scene, Ray *ray, int depth){
-	double minDistance = -1;
+	float minDistance = -1;
 
 	Light *light = scene->lightSource;
 	Hit realHit;
@@ -105,7 +105,7 @@ Color TraceRayR(Scene *scene, Ray *ray, int depth){
 		if(depth == 0) sorted = true;
 		Hit currentHit = Model_intersection(scene->models[i], ray, sorted);
 		if(currentHit.point != NULL){
-			double distance = Point_distanceSquared(ray->origin, currentHit.point);
+			float distance = Point_distanceSquared(ray->origin, currentHit.point);
 			if(minDistance == -1 || distance < minDistance){
 				realHit = currentHit;
 				minDistance = distance;
@@ -122,25 +122,25 @@ Color TraceRayR(Scene *scene, Ray *ray, int depth){
 
 	realHit.normal = Vector_normalize(realHit.normal);
 
-	double shadowFactor = CalculateShadowFactor(scene, realHit, vectorLight);
+	float shadowFactor = CalculateShadowFactor(scene, realHit, vectorLight);
 
 	Vector oppositeDirection = Vector_normalize(Vector_scale(ray->direction, -1));
 
-	double diffuseStrength = fmax(0.1, Vector_dot(realHit.normal, vectorLight));
+	float diffuseStrength = fmax(0.1, Vector_dot(realHit.normal, vectorLight));
 
 	Vector tempN = Vector_scale(realHit.normal, 2 * Vector_dot(realHit.normal, vectorLight));
 	Vector R = Vector_normalize(Vector_sum(tempN, Vector_scale(vectorLight, -1)));
 
 	int shininess = 32;
-	double spec = pow(fmax(Vector_dot(R, oppositeDirection), 0.0), shininess);
-	double specularStrength = realHit.material.shininess;
+	float spec = pow(fmax(Vector_dot(R, oppositeDirection), 0.0), shininess);
+	float specularStrength = realHit.material.shininess;
 	
 	Color diffuseColor = Color_scale(Color_multiply(realHit.material.color, light->color), diffuseStrength * shadowFactor);
 	Color specularColor = Color_scale(COLOR_WHITE, specularStrength * spec * shadowFactor);
 
 	if (realHit.material.reflexivity > 0 && depth < MAX_DEPTH) {
 		Vector reflex = Reflect(ray->direction, realHit.normal);
-		double epsilon = 1e-5;
+		float epsilon = 1e-3;
 		Vector delta = Vector_scale(realHit.normal, epsilon);
 
 		Ray *reflexRay = Line_init(Point_translate(realHit.point, delta), reflex);
@@ -151,8 +151,8 @@ Color TraceRayR(Scene *scene, Ray *ray, int depth){
 	Color finalColor = Color_add(diffuseColor, specularColor);
 
 
-	double distanceSquared = Point_distanceSquared(realHit.point, light->position);
-	double attenuation = light->constant + light->linear * sqrt(distanceSquared) + light->quadratic * distanceSquared;
+	float distanceSquared = Point_distanceSquared(realHit.point, light->position);
+	float attenuation = light->constant + light->linear * sqrt(distanceSquared) + light->quadratic * distanceSquared;
 	attenuation = 1 / attenuation;
 
 	return Color_scale(finalColor, attenuation);
@@ -163,29 +163,29 @@ Point *intersection_Point(Ray *ray, Triangle *t){
 	A = t->a;
 	B = t->b;
 	C = t->c;
-	double EPSILON = 1e-8;
+	float EPSILON = 1e-3;
 	Vector e1 = Vector_fromPoints(A, B);
 	Vector e2 = Vector_fromPoints(A, C);
 
 	Vector h = Vector_crossProduct(ray->direction, e2);
-	double a = Vector_dot(e1, h);
+	float a = Vector_dot(e1, h);
 	if (fabs(a) < EPSILON) {
 		return NULL;
 	}
 
 	Vector s = Vector_fromPoints(A, ray->origin);
-	double u = Vector_dot(s, h) / a;
+	float u = Vector_dot(s, h) / a;
 	if (u < 0.0 || u > 1.0) {
 		return NULL;
 	}
 
 	Vector q = Vector_crossProduct(s, e1);
-	double v = Vector_dot(ray->direction, q) / a;
+	float v = Vector_dot(ray->direction, q) / a;
 	if (v < 0.0 || u + v > 1.0) {
 		return NULL;
 	}
 
-	double ti = Vector_dot(e2, q) / a;
+	float ti = Vector_dot(e2, q) / a;
 	//if intersection is in the opposite direction of the line exclude it
 	if (ti < 1e-6) return NULL;
 
@@ -201,27 +201,27 @@ Hit Sphere_intersection(Model *sphere, Ray *ray) {
 	Point *O = ray->origin;
 	Vector D = ray->direction;
 	Point *C = sphere->center;
-	double r = fmax(0.1, sphere->maxDistanceFromCenter);
+	float r = fmax(0.1, sphere->maxDistanceFromCenter);
 
 	Vector L = Vector_fromPoints(C, O);
 
 	// Compute a, b, c
-	double a = Vector_dot(D, D);
-	double b = 2 * Vector_dot(L, D);
-	double c = Vector_dot(L, L) - r * r;
+	float a = Vector_dot(D, D);
+	float b = 2 * Vector_dot(L, D);
+	float c = Vector_dot(L, L) - r * r;
 
-	double discriminant = b * b - 4 * a * c;
+	float discriminant = b * b - 4 * a * c;
 
 	if (discriminant < 0) {
 		// No intersection
 		return hit;
 	}
 
-	double sqrt_discriminant = sqrt(discriminant);
-	double t1 = (-b - sqrt_discriminant) / (2 * a);
-	double t2 = (-b + sqrt_discriminant) / (2 * a);
+	float sqrt_discriminant = sqrt(discriminant);
+	float t1 = (-b - sqrt_discriminant) / (2 * a);
+	float t2 = (-b + sqrt_discriminant) / (2 * a);
 
-	double t;
+	float t;
 	if (t1 > 0) t = t1;
 	else if (t2 > 0) t = t2;
 	else return hit; // Both intersections are behind the camera
@@ -243,7 +243,7 @@ Hit Model_intersection(Model *model, Ray *ray, bool triangleSorted){
 	}
 	Hit hit;
 	hit.point = NULL;
-	double linePointDistance = Line_Point_distance(ray, model->center);
+	float linePointDistance = Line_Point_distance(ray, model->center);
 	if(linePointDistance > model->maxDistanceFromCenter){
 		return hit;
 	}
@@ -255,12 +255,12 @@ Hit Model_intersection(Model *model, Ray *ray, bool triangleSorted){
 	}
 
 	Point *intersection = NULL;
-	double minDistance = -1;
+	float minDistance = -1;
 	Triangle *hitTriangle = NULL;
 	for(int i = 0; i < model->numTriangles; i++){
 		Point *p = intersection_Point(ray, model->triangles[i]);
 		if(p != NULL){
-			double distance = Point_distanceSquared(ray->origin, p);
+			float distance = Point_distanceSquared(ray->origin, p);
 			if(minDistance == -1 || distance < minDistance){
 				intersection = p;
 				hitTriangle = model->triangles[i];
