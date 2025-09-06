@@ -6,9 +6,9 @@
 
 Triangle *Triangle_init(Point *a, Point *b, Point *c, unsigned char material){
 	Triangle *t = malloc(sizeof(Triangle));
-	t->a = a;
-	t->b = b;
-	t->c = c;
+	t->a = Point_copy(a);
+	t->b = Point_copy(b);
+	t->c = Point_copy(c);
 	t->material = material;
 	return t;
 }
@@ -35,7 +35,7 @@ Model *Model_new(){
 	model->numTriangles = 0;
 	model->triangles = NULL;
 	model->center = NULL;
-	model->maxDistanceFromCenter = 0;
+	model->boundingRadius = 0;
 	return model;
 }
 
@@ -89,7 +89,7 @@ Model *Model_createSphere(Point *center, float radius, Material material){
 			);
 		}
 	}
-	sphere->maxDistanceFromCenter = radius;
+	sphere->boundingRadius = radius;
 	sphere->center = center;
 	sphere->type = SPHERE;
 
@@ -117,7 +117,7 @@ Model *Model_createRectXY(Point *origin, float width, float height, Material mat
 	z = origin->z;
 
 	rect->center = Point_init(x + width/2, y + height/2, z);
-	rect->maxDistanceFromCenter = sqrt(pow(width/2, 2) + pow(height/2, 2));
+	rect->boundingRadius = sqrt(pow(width/2, 2) + pow(height/2, 2));
 
 	Point *p1, *p2, *p3;
 
@@ -148,7 +148,7 @@ Model *Model_createRectXZ(Point *origin, float width, float height, Material mat
 	z = origin->z;
 
 	rect->center = Point_init(x + width/2, y, z + height/2);
-	rect->maxDistanceFromCenter = sqrt(pow(width/2, 2) + pow(height/2, 2));
+	rect->boundingRadius = sqrt(pow(width/2, 2) + pow(height/2, 2));
 
 	Point *p1, *p2, *p3;
 
@@ -179,7 +179,7 @@ Model *Model_createRectYZ(Point *origin, float width, float height, Material mat
 	z = origin->z;
 
 	rect->center = Point_init(x, y + height/2, z + width/2);
-	rect->maxDistanceFromCenter = sqrt(pow(width/2, 2) + pow(height/2, 2));
+	rect->boundingRadius = sqrt(pow(width/2, 2) + pow(height/2, 2));
 
 	Point *p1, *p2, *p3;
 
@@ -220,7 +220,7 @@ Model *Model_createBox(Point *origin, float width, float height, float depth, Ma
 	};
 
 	box->center = Point_init(x + width / 2, y + height / 2, z + depth / 2);
-	box->maxDistanceFromCenter = sqrt(width*width + height*height + depth*depth) / 2;
+	box->boundingRadius = sqrt(width*width + height*height + depth*depth) / 2;
 
 	// Triangle indices for each face (2 triangles per face)
 	int faces[12][3] = {
@@ -264,28 +264,25 @@ void Model_translate(Model *model, Vector translation){
 
 void Model_scale(Model *model, float scalar){
 	if(model == NULL || scalar < 0) return;
-	model->maxDistanceFromCenter *= scalar;
+	model->boundingRadius *= scalar;
 	for(int i = 0; i < model->numTriangles; i++){
 		Vector v;
 		Triangle *t = model->triangles[i];
 
 		v = Vector_fromPoints(model->center, t->a);
 		v = Vector_scale(v, scalar);
-		t->a->x = model->center->x + v.x;
-		t->a->y = model->center->y + v.y;
-		t->a->z = model->center->z + v.z;
+		free(t->a);
+		t->a = Point_translate(model->center, v);
 
 		v = Vector_fromPoints(model->center, t->b);
 		v = Vector_scale(v, scalar);
-		t->b->x = model->center->x + v.x;
-		t->b->y = model->center->y + v.y;
-		t->b->z = model->center->z + v.z;
+		free(t->b);
+		t->b = Point_translate(model->center, v);
 
 		v = Vector_fromPoints(model->center, t->c);
 		v = Vector_scale(v, scalar);
-		t->c->x = model->center->x + v.x;
-		t->c->y = model->center->y + v.y;
-		t->c->z = model->center->z + v.z;
+		free(t->c);
+		t->c = Point_translate(model->center, v);
 	}
 }
 

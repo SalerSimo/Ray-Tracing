@@ -24,6 +24,7 @@ typedef struct{
 
 // Constructor
 Point*  Point_init(float x, float y, float z);
+Point*  Point_copy(Point *p);
 
 // Operations
 float  Point_distanceSquared(Point *a, Point *b);

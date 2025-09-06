@@ -184,7 +184,7 @@ Model* Model_fromOBJ(const char *fileName) {
 	model->numTriangles = triCount;
 	model->triangles = triangles;
 	model->center = center;
-	model->maxDistanceFromCenter = sqrt(maxDist);
+	model->boundingRadius = sqrt(maxDist);
 	model->type = GENERIC;
 
 	return model;
@@ -193,7 +193,7 @@ Model* Model_fromOBJ(const char *fileName) {
 int Model_toOBJ(const Model *model, const char *fileName) {
 	if (!model || !fileName) return -1;
 
-	FILE *file = fopen(fileName, "w");
+	FILE *file = fopen(GetFullPath((char *)fileName), "w");
 	if (!file) {
 		perror("Failed to open file for writing");
 		return -1;

@@ -191,10 +191,6 @@ Scene *CreateScene(int numObj, char **objs){
 
 	Scene_addModels(scene, objects, numObj);
 
-	for(int i = 0; i < scene->numModels; i++){
-		Model_sortTriangles(scene->models[i], scene->camera->position);
-	}
-
 	printf("Scene size is %zu bytes\n", Scene_size(scene));
 
 	return scene;

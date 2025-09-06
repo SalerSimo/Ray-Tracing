@@ -43,7 +43,7 @@ int isInShadow(Scene *scene, Hit realHit, Point *lightPoint){
 }
 
 float CalculateShadowFactor(Scene *scene, Hit realHit, Vector vectorLight){
-	float epsilon = 1e-2;
+	float epsilon = 1e-4;
 	Vector offset = Vector_scale(realHit.normal, epsilon);
 	realHit.point = Point_translate(realHit.point, offset);
 	int inShadow = 0;
@@ -97,7 +97,7 @@ Color TraceRayR(Scene *scene, Ray *ray, int depth){
 
 	for(int i = 0; i < scene->numModels; i++){
 		if(scene->models[i] == NULL) continue;
-		if(realHit.point != NULL && Vector_dot(Vector_fromPoints(scene->models[i]->center, realHit.point), ray->direction) < 0 && Point_distanceSquared(scene->models[i]->center, realHit.point) > scene->models[i]->maxDistanceFromCenter * scene->models[i]->maxDistanceFromCenter){
+		if(realHit.point != NULL && Vector_dot(Vector_fromPoints(scene->models[i]->center, realHit.point), ray->direction) < 0 && Point_distanceSquared(scene->models[i]->center, realHit.point) > scene->models[i]->boundingRadius * scene->models[i]->boundingRadius){
 			continue;
 		}
 		bool sorted = false;
@@ -140,7 +140,7 @@ Color TraceRayR(Scene *scene, Ray *ray, int depth){
 
 	if (realHit.material.reflexivity > 0 && depth < MAX_DEPTH) {
 		Vector reflex = Reflect(ray->direction, realHit.normal);
-		float epsilon = 1e-3;
+		float epsilon = 1e-4;
 		Vector delta = Vector_scale(realHit.normal, epsilon);
 
 		Ray *reflexRay = Line_init(Point_translate(realHit.point, delta), reflex);
@@ -200,7 +200,7 @@ Hit Sphere_intersection(Model *sphere, Ray *ray) {
 	Point *O = ray->origin;
 	Vector D = ray->direction;
 	Point *C = sphere->center;
-	float r = fmax(0.1, sphere->maxDistanceFromCenter);
+	float r = fmax(0.1, sphere->boundingRadius);
 
 	Vector L = Vector_fromPoints(C, O);
 
@@ -243,13 +243,13 @@ Hit Model_intersection(Model *model, Ray *ray, bool triangleSorted){
 	Hit hit;
 	hit.point = NULL;
 	float linePointDistance = Line_Point_distance(ray, model->center);
-	if(linePointDistance > model->maxDistanceFromCenter){
+	if(linePointDistance > model->boundingRadius){
 		return hit;
 	}
 
 	Point *q = Line_projectionPoint(ray, model->center);
 	Vector pq = Vector_fromPoints(ray->origin, q);
-	if(Vector_dot(pq, ray->direction) + model->maxDistanceFromCenter < 0){
+	if(Vector_dot(pq, ray->direction) + model->boundingRadius < 0){
 		return hit;
 	}
 
@@ -264,7 +264,7 @@ Hit Model_intersection(Model *model, Ray *ray, bool triangleSorted){
 				intersection = p;
 				hitTriangle = model->triangles[i];
 				minDistance = distance;
-				if(triangleSorted) break;
+				//if(triangleSorted) break;
 			}
 		}
 	}

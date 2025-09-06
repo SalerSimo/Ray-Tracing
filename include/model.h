@@ -53,7 +53,7 @@ typedef struct{
 	/** Center of the model. */
 	Point *center;
 	/** Maximum distance from the center to any point on the model (bounding radius). */
-	float maxDistanceFromCenter;
+	float boundingRadius;
 	/** Type of model. */
 	ModelType type;
 }Model;

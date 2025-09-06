@@ -146,3 +146,8 @@ int Vector_size(Vector v){
 	size += sizeof(v.normSquared);
 	return size;
 }
+
+Point* Point_copy(Point *p){
+	if(p == NULL) return NULL;
+	return Point_init(p->x, p->y, p->z);
+}
