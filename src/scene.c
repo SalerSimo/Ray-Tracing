@@ -99,9 +99,7 @@ size_t Scene_size(Scene *s){
 	size += Camera_size(s->camera);
 	size += s->numModels * sizeof(*s->models);
 	for(int i = 0; i < s->numModels; i++){
-		size_t m = Model_size(s->models[i]);
-		printf("model %d size: %d bytes\n", i, m);
-		size += m;
+		size += Model_size(s->models[i]);
 	}
 	return size;
 }
