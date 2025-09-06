@@ -39,7 +39,7 @@ Model *Model_new(){
 	return model;
 }
 
-Model *Model_createSphere(Point *center, float radius, float reflexivity, float shininess, Color color){
+Model *Model_createSphere(Point *center, float radius, Material material){
 	int numPoints = (LAT_DIVS + 1) * LON_DIVS;
 	Point **points = malloc(numPoints * sizeof(Point*));
 	Model *sphere = Model_new();
@@ -95,9 +95,7 @@ Model *Model_createSphere(Point *center, float radius, float reflexivity, float 
 
 	sphere->materials = malloc(sizeof(Material));
 	sphere->numMaterials = 1;
-	sphere->materials[0].color = color;
-	sphere->materials[0].reflexivity = reflexivity;
-	sphere->materials[0].shininess = shininess;
+	sphere->materials[0] = material;
 	return sphere;
 }
 
@@ -109,7 +107,7 @@ float Model_area(Model *model){
 	return area;
 }
 
-Model *Model_createRectXY(Point *origin, float width, float height, float reflexivity, float shininess, Color color){
+Model *Model_createRectXY(Point *origin, float width, float height, Material material){
 	Model *rect = Model_new();
 	if(rect == NULL) return NULL;
 
@@ -136,13 +134,11 @@ Model *Model_createRectXY(Point *origin, float width, float height, float reflex
 
 	rect->materials = malloc(sizeof(Material));
 	rect->numMaterials = 1;
-	rect->materials[0].color = color;
-	rect->materials[0].reflexivity = reflexivity;
-	rect->materials[0].shininess = shininess;
+	rect->materials[0] = material;
 	return rect;
 }
 
-Model *Model_createRectXZ(Point *origin, float width, float height, float reflexivity, float shininess, Color color){
+Model *Model_createRectXZ(Point *origin, float width, float height, Material material){
 	Model *rect = Model_new();
 	if(rect == NULL) return NULL;
 
@@ -169,13 +165,11 @@ Model *Model_createRectXZ(Point *origin, float width, float height, float reflex
 
 	rect->materials = malloc(sizeof(Material));
 	rect->numMaterials = 1;
-	rect->materials[0].color = color;
-	rect->materials[0].reflexivity = reflexivity;
-	rect->materials[0].shininess = shininess;
+	rect->materials[0] = material;
 	return rect;
 }
 
-Model *Model_createRectYZ(Point *origin, float width, float height, float reflexivity, float shininess, Color color){
+Model *Model_createRectYZ(Point *origin, float width, float height, Material material){
 	Model *rect = Model_new();
 	if(rect == NULL) return NULL;
 
@@ -202,13 +196,11 @@ Model *Model_createRectYZ(Point *origin, float width, float height, float reflex
 
 	rect->materials = malloc(sizeof(Material));
 	rect->numMaterials = 1;
-	rect->materials[0].color = color;
-	rect->materials[0].reflexivity = reflexivity;
-	rect->materials[0].shininess = shininess;
+	rect->materials[0] = material;
 	return rect;
 }
 
-Model *Model_createBox(Point *origin, float width, float height, float depth, float reflexivity, float shininess, Color color) {
+Model *Model_createBox(Point *origin, float width, float height, float depth, Material material) {
 	Model *box = Model_new();
 	if (box == NULL) return NULL;
 
@@ -252,9 +244,7 @@ Model *Model_createBox(Point *origin, float width, float height, float depth, fl
 
 	box->materials = malloc(sizeof(Material));
 	box->numMaterials = 1;
-	box->materials[0].color = color;
-	box->materials[0].reflexivity = reflexivity;
-	box->materials[0].shininess = shininess;
+	box->materials[0] = material;
 	return box;
 }
 

@@ -27,7 +27,9 @@ void Scene_fill(Scene *s, Light *lightSource, Model **models, int numModels){
 	for(int i = 0; i < s->numModels - 1; i++){
 		s->models[i] = models[i];
 	}
-	s->models[s->numModels - 1] = Model_createSphere(lightSource->position, lightSource->radius, 0, 0, lightSource->color);
+	Material lightMaterial;
+	lightMaterial.diffuse = lightSource->color;
+	s->models[s->numModels - 1] = Model_createSphere(lightSource->position, lightSource->radius, lightMaterial);
 	s->models[s->numModels - 1]->type = LIGHT;
 
 	Scene_sortModels(s);

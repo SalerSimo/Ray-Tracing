@@ -12,7 +12,7 @@ int ExtractVertexIndex(const char *token) {
 }
 
 
-int LoadColors(char *fileName, char ***names, Color **color) {
+int LoadMaterials(char *fileName, char ***names, Material **materials) {
 	FILE *file = fopen(fileName, "r");
 	if (!file) {
 		perror("Error opening file");
@@ -20,15 +20,15 @@ int LoadColors(char *fileName, char ***names, Color **color) {
 	}
 
 	char line[LINE_MAX_LEN];
-	int colorCapacity = 8;
-	int colorCount = 0;
+	int materialCapacity = 8;
+	int materialCount = -1;
 
-	Color *colors = malloc(colorCapacity * sizeof(Color));
-	char **colorNames = malloc(colorCapacity * sizeof(char*));
+	char **materialNames = malloc(materialCapacity * sizeof(char*));
+
+	Material *mats = malloc(materialCapacity * sizeof(Material));
 
 	char *currentName = NULL;
 	float r, g, b;
-	int hasColor = 0;
 
 	while (fgets(line, sizeof(line), file)) {
 		char *word = strtok(line, " \t\r\n");
@@ -37,29 +37,40 @@ int LoadColors(char *fileName, char ***names, Color **color) {
 
 		if (strcmp(word, "newmtl") == 0) {
 			currentName = strdup(strtok(NULL, " \t\r\n"));
-			hasColor = 0;
+			materialCount++;
+			materialNames[materialCount] = currentName;
+			if (materialCount >= materialCapacity) {
+				materialCapacity *= 2;
+				materialNames = realloc(materialNames, materialCapacity * sizeof(char*));
+				mats = realloc(mats, materialCapacity * sizeof(Material));
+			}
 		} else if (strcmp(word, "Kd") == 0 && currentName != NULL) {
 			r = atof(strtok(NULL, " \t\r\n"));
 			g = atof(strtok(NULL, " \t\r\n"));
 			b = atof(strtok(NULL, " \t\r\n"));
 
-			if (colorCount >= colorCapacity) {
-				colorCapacity *= 2;
-				colors = realloc(colors, colorCapacity * sizeof(Color));
-				colorNames = realloc(colorNames, colorCapacity * sizeof(char*));
-			}
+			mats[materialCount].diffuse = Color_fromRGB(r, g, b);
+			mats[materialCount].ambient = 0.05;
+		}
+		else if (strcmp(word, "Ks") == 0 && currentName != NULL) {
+			r = atof(strtok(NULL, " \t\r\n"));
+			g = atof(strtok(NULL, " \t\r\n"));
+			b = atof(strtok(NULL, " \t\r\n"));
 
-			colors[colorCount] = Color_fromRGB(r, g, b);
-			colorNames[colorCount] = currentName;
-			colorCount++;
-			hasColor = 1;
+			mats[materialCount].specular = Color_fromRGB(r, g, b);
+		}
+		else if (strcmp(word, "Ns") == 0 && currentName != NULL) {
+			int exp = atoi(strtok(NULL, " \t\r\n"));
+			printf("%d\n", exp);
+
+			mats[materialCount].specularExponent = exp;
 		}
 	}
 	fclose(file);
 
-	*names = colorNames;
-	*color = colors;
-	return colorCount;
+	*names = materialNames;
+	*materials = mats;
+	return materialCount + 1;
 }
 
 int getIndex(char *word, char **array, int n){
@@ -89,13 +100,9 @@ Model* Model_fromOBJ(const char *fileName) {
 	triangles = malloc(sizeof(Triangle*) * triCapacity);
 
 	char line[LINE_MAX_LEN];
-	char **colorNames;
-	Color *colors;
-	int numColors;
-	Material *materials = malloc(sizeof(Material));
-	materials[0].color = COLOR_WHITE;
-	materials[0].reflexivity = 0;	
-	materials[0].shininess = 0;
+	int numMaterials;
+	char **materialNames;
+	Material *materials;
 	int actualMaterial = 0;
 	while (fgets(line, sizeof(line), file)) {
 		if (line[0] == 'v' && line[1] == ' ') {
@@ -129,6 +136,10 @@ Model* Model_fromOBJ(const char *fileName) {
 			if (triCount >= triCapacity) {
 				triCapacity *= 2;
 				triangles = realloc(triangles, sizeof(Triangle*) * triCapacity);
+				if(triangles == NULL){
+					printf("Realloc failed\n");
+					return NULL;
+				}
 			}
 
 			Triangle *t = Triangle_init(points[i1 - 1], points[i2 - 1], points[i3 - 1], actualMaterial);
@@ -138,17 +149,11 @@ Model* Model_fromOBJ(const char *fileName) {
 			char *word = strtok(line, " \t\r\n");
 			if(strcmp(word, "mtllib") == 0){
 				word = strtok(NULL, " \t\r\n");
-				numColors = LoadColors(strcat(directoryPath, word), &colorNames, &colors);
-				materials = malloc(numColors * sizeof(Material));
-				for(int i = 0; i < numColors; i++){
-					materials[i].color = colors[i];
-					materials[i].reflexivity = 0;
-					materials[i].shininess = 0;
-				}
+				numMaterials = LoadMaterials(strcat(directoryPath, word), &materialNames, &materials);
 			}
 			else if(strcmp(word, "usemtl") == 0){
 				word = strtok(NULL, " \t\r\n");
-				actualMaterial = getIndex(word, colorNames, numColors);
+				actualMaterial = getIndex(word, materialNames, numMaterials);
 				if(actualMaterial < 0) actualMaterial = 0;
 			}
 		}
@@ -175,7 +180,7 @@ Model* Model_fromOBJ(const char *fileName) {
 
 	Model *model = malloc(sizeof(Model));
 	model->materials = materials;
-	model->numMaterials = numColors;
+	model->numMaterials = numMaterials;
 	model->numTriangles = triCount;
 	model->triangles = triangles;
 	model->center = center;

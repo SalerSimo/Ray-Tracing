@@ -114,32 +114,66 @@ Scene *CreateScene(int numObj, char **objs){
 	float fov = 90 * M_PI / 180;
 	Camera *camera = Camera_new(Point_init(0, 0, 20), Vector_init(0, 0, -1), Vector_init(0, 1, 0), fov);
 	Scene *scene = Scene_init(camera);
+
+	Material mat;
+	
 	
 	float floorY = -10;
-	Model *floor = Model_createRectXZ(Point_init(-500, floorY, -500), 1000, 1000, 0, 0, COLOR_BLUE);
+	mat.diffuse = COLOR_BLUE;
+	mat.specular = COLOR_BLACK;
+	mat.reflexivity = 0;
+	mat.specularExponent = 0;
+	mat.ambient = 0.05;
+	Model *floor = Model_createRectXZ(Point_init(-500, floorY, -500), 1000, 1000, mat);
 
 	int numSphere = 8;
 	Model **spheres = malloc(numSphere * sizeof(Model*));
 
 	float radius = 10;
-	spheres[0] = Model_createSphere(Point_init(10, floorY+radius, -20), radius, 1, 0.5, COLOR_GREEN);
+	mat.diffuse = COLOR_GREEN;
+	mat.specular = Color_fromRGB(0.5, 0.5, 0.5);
+	mat.specularExponent = 32;
+	mat.ambient = 0.05;
+	mat.reflexivity = 1;
+	spheres[0] = Model_createSphere(Point_init(10, floorY+radius, -20), radius, mat);
+
 	radius = 3;
-	spheres[1] = Model_createSphere(Point_init(-5, floorY+radius, -10), radius, 0, 0, COLOR_RED);
+	mat.diffuse = COLOR_RED;
+	mat.reflexivity = 0;
+	spheres[1] = Model_createSphere(Point_init(-5, floorY+radius, -10), radius, mat);
+
 	radius = 1;
-	spheres[2] = Model_createSphere(Point_init(10, floorY+radius, -10), radius, 0, 0, COLOR_YELLOW);
+	mat.diffuse = COLOR_YELLOW;
+	mat.reflexivity = 0;
+	spheres[2] = Model_createSphere(Point_init(10, floorY+radius, -10), radius, mat);
+
 	radius = 2;
-	spheres[3] = Model_createSphere(Point_init(5, floorY+radius, -12), radius, 0, 0, COLOR_GREEN);
+	mat.diffuse = COLOR_GREEN;
+	mat.reflexivity = 0;
+	spheres[3] = Model_createSphere(Point_init(5, floorY+radius, -12), radius, mat);
+	
 	radius = 4;
-	spheres[4] = Model_createSphere(Point_init(20, floorY+radius, -12), radius, 0, 0.1, COLOR_ORANGE);
+	mat.diffuse = COLOR_ORANGE;
+	mat.reflexivity = 0;
+	spheres[4] = Model_createSphere(Point_init(20, floorY+radius, -12), radius, mat);
+
 	radius = 15;
-	spheres[5] = Model_createSphere(Point_init(-20, floorY+radius, -30), radius, 0.2, 0.5, COLOR_YELLOW);
+	mat.diffuse = COLOR_YELLOW;
+	mat.reflexivity = 0.2;
+	spheres[5] = Model_createSphere(Point_init(-20, floorY+radius, -30), radius, mat);
+	
 	radius = 1.5;
-	spheres[6] = Model_createSphere(Point_init(5, floorY+radius, -2), radius, 0, 0.2, COLOR_CYAN);
+	mat.diffuse = COLOR_CYAN;
+	mat.reflexivity = 0;
+	spheres[6] = Model_createSphere(Point_init(5, floorY+radius, -2), radius, mat);
+	
 	radius = 1.5;
-	spheres[7] = Model_createSphere(Point_init(-10, floorY+radius, 0), radius, 0, 0.2, COLOR_MAGENTA);
+	mat.diffuse = COLOR_MAGENTA;
+	mat.reflexivity = 0;
+	spheres[7] = Model_createSphere(Point_init(-10, floorY+radius, 0), radius, mat);
 
 	Vector lightDirection = Vector_normalize(Vector_init(10, 5, 0));
-	int scale = 20;
+	int scale = 50;
 	Point* lightPos = Point_translate(Point_init(0, 0, 0), Vector_scale(lightDirection, scale));
 	radius = 0.05;
 	radius = 0;

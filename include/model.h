@@ -12,12 +12,16 @@
  * Represents the material properties of a 3D model.
  */
 typedef struct{
-	/** Color of the material. */
-	Color color;
+	/** Ambient light intensity */
+	float ambient;
+	/** Diffuse light color */
+	Color diffuse;
+	/** Specular light color */
+	Color specular;
+	/** Specular exponent (shininess) */
+	int specularExponent;
 	/** Model reflection coefficient (0 = no reflection, 1 = perfect mirror). */
 	float reflexivity;
-	/** Model shininess (0 = fully rough, 1 = fully smooth). */
-	float shininess;
 }Material;
 
 typedef struct{
@@ -61,14 +65,12 @@ typedef struct{
  * @param origin Pointer to the bottom-left corner of the rectangle.
  * @param width Length of the rectangle along the X-axis.
  * @param height Length of the rectangle along the Y-axis.
- * @param reflexivity Model reflection coefficient (0 = no reflection, 1 = perfect mirror).
- * @param shininess Model shininess (0 = fully rough, 1 = fully smooth).
- * @param color 32-bit RGB color of the box model.
+ * @param material Material properties of the rectangle.
  * 
  * @return Pointer to the newly created Model representing the rectangle,
  *         or NULL if memory allocation fails.
  */
-Model *Model_createRectXY(Point *origin, float width, float height, float reflexivity, float shininess, Color color);
+Model *Model_createRectXY(Point *origin, float width, float height, Material material);
 
 /**
  * Creates a rectangular model aligned to the X-Z plane.
@@ -76,14 +78,12 @@ Model *Model_createRectXY(Point *origin, float width, float height, float reflex
  * @param origin Pointer to the bottom-left corner of the rectangle.
  * @param width Length of the rectangle along the X-axis.
  * @param height Length of the rectangle along the Z-axis.
- * @param reflexivity Model reflection coefficient (0 = no reflection, 1 = perfect mirror).
- * @param shininess Model shininess (0 = fully rough, 1 = fully smooth).
- * @param color 32-bit RGB color of the box model.
+ * @param material Material properties of the rectangle.
  * 
  * @return Pointer to the allocated Model representing the rectangle,
  *         or NULL if memory allocation fails.
  */
-Model *Model_createRectXZ(Point *origin, float width, float height, float reflexivity, float shininess, Color color);
+Model *Model_createRectXZ(Point *origin, float width, float height, Material material);
 
 /**
  * Creates a rectangular model aligned to the Y-Z plane.
@@ -91,14 +91,12 @@ Model *Model_createRectXZ(Point *origin, float width, float height, float reflex
  * @param origin Pointer to the bottom-left corner of the rectangle.
  * @param width Length of the rectangle along the Z-axis.
  * @param height Length of the rectangle along the Y-axis.
- * @param reflexivity Model reflection coefficient (0 = no reflection, 1 = perfect mirror).
- * @param shininess Model shininess (0 = fully rough, 1 = fully smooth).
- * @param color 32-bit RGB color of the box model.
+ * @param material Material properties of the rectangle.
  * 
  * @return Pointer to the allocated Model representing the rectangle,
  *         or NULL if memory allocation fails.
  */
-Model *Model_createRectYZ(Point *origin, float width, float height, float reflexivity, float shininess, Color color);
+Model *Model_createRectYZ(Point *origin, float width, float height, Material material);
 
 /**
  * Creates a 3D box-shaped Model object.
@@ -107,28 +105,24 @@ Model *Model_createRectYZ(Point *origin, float width, float height, float reflex
  * @param width Length of the box along the X-axis.
  * @param height Length of the box along the Y-axis.
  * @param depth Length of the box along the Z-axis.
- * @param reflexivity Model reflection coefficient (0 = no reflection, 1 = perfect mirror).
- * @param shininess Model shininess (0 = fully rough, 1 = fully smooth).
- * @param color 32-bit RGB color of the box model.
+ * @param material Material properties of the box.
  * 
  * @return Pointer to the allocated Model representing the box 
  *         or NULL if allocation fails.
  */
-Model *Model_createBox(Point *origin, float width, float height, float depth, float reflexivity, float shininess, Color color);
+Model *Model_createBox(Point *origin, float width, float height, float depth, Material material);
 
 /**
  * Creates a spherical model centered at the given point.
  * 
- * @param conter Pointer to the center point of the sphere.
- * @param radius The radius of the sphere
- * @param reflexivity Model reflection coefficient (0 = no reflection, 1 = perfect mirror).
- * @param smoothness Model smoothness (0 = fully rough, 1 = fully smooth).
- * @param color 32-bit RGB color of the box model.
+ * @param center Pointer to the center point of the sphere.
+ * @param radius The radius of the sphere.
+ * @param material Material properties of the sphere.
  * 
  * @return Pointer to the allocated Model representing the sphere 
  *         or NULL if allocation fails.
  */
-Model *Model_createSphere(Point *center, float radius, float reflexivity, float shininess, Color color);
+Model *Model_createSphere(Point *center, float radius, Material material);
 
 /**
  * @brief Translates all vertices of the Model by a given vector.

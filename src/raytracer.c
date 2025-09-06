@@ -85,7 +85,6 @@ float CalculateShadowFactor(Scene *scene, Hit realHit, Vector vectorLight){
 		shadowFactor = 1 - isInShadow(scene, realHit, light->position);
 	}
 
-	shadowFactor = fmax(shadowFactor, 0.1);
 	return shadowFactor;
 }
 
@@ -113,7 +112,7 @@ Color TraceRayR(Scene *scene, Ray *ray, int depth){
 		}
 	}
 	if(realHit.point == NULL) return Color_multiply(BACKGROUND_COLOR, light->color);
-	if (realHit.model->type == LIGHT) return realHit.material.color;
+	if (realHit.model->type == LIGHT) return realHit.material.diffuse;
 
 	Vector vectorLight = Vector_normalize(Vector_fromPoints(realHit.point, light->position));
 
@@ -131,12 +130,13 @@ Color TraceRayR(Scene *scene, Ray *ray, int depth){
 	Vector tempN = Vector_scale(realHit.normal, 2 * Vector_dot(realHit.normal, vectorLight));
 	Vector R = Vector_normalize(Vector_sum(tempN, Vector_scale(vectorLight, -1)));
 
-	int shininess = 32;
-	float spec = pow(fmax(Vector_dot(R, oppositeDirection), 0.0), shininess);
-	float specularStrength = realHit.material.shininess;
-	
-	Color diffuseColor = Color_scale(Color_multiply(realHit.material.color, light->color), diffuseStrength * shadowFactor);
-	Color specularColor = Color_scale(COLOR_WHITE, specularStrength * spec * shadowFactor);
+	float spec = pow(fmax(Vector_dot(R, oppositeDirection), 0.0), realHit.material.specularExponent);
+
+	Color diffuseColor = Color_scale(Color_multiply(realHit.material.diffuse, light->color), diffuseStrength * shadowFactor);
+	Color specularColor = Color_scale(realHit.material.specular, spec * shadowFactor);
+	if(realHit.material.ambient < 0) realHit.material.ambient = 0;
+	if(realHit.material.ambient > 1) realHit.material.ambient = 1;
+	Color ambientColor = Color_scale(realHit.material.diffuse, realHit.material.ambient);
 
 	if (realHit.material.reflexivity > 0 && depth < MAX_DEPTH) {
 		Vector reflex = Reflect(ray->direction, realHit.normal);
@@ -148,8 +148,7 @@ Color TraceRayR(Scene *scene, Ray *ray, int depth){
 		reflectedColor = Color_scale(reflectedColor, 0.95); // a model cannot reflect 100% of the light it absorbs
 		diffuseColor = Color_blend(diffuseColor, reflectedColor, realHit.material.reflexivity);
 	}
-	Color finalColor = Color_add(diffuseColor, specularColor);
-
+	Color finalColor = Color_add(Color_add(diffuseColor, specularColor), ambientColor);
 
 	float distanceSquared = Point_distanceSquared(realHit.point, light->position);
 	float attenuation = light->constant + light->linear * sqrt(distanceSquared) + light->quadratic * distanceSquared;
@@ -163,7 +162,7 @@ Point *intersection_Point(Ray *ray, Triangle *t){
 	A = t->a;
 	B = t->b;
 	C = t->c;
-	float EPSILON = 1e-3;
+	float EPSILON = 1e-5;
 	Vector e1 = Vector_fromPoints(A, B);
 	Vector e2 = Vector_fromPoints(A, C);
 
