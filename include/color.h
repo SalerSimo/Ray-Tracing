@@ -83,4 +83,6 @@ Color Color_average(Color* colors, int n);
 
 Color Color_multiply(Color c1, Color c2);
 
+int Color_size(Color color);
+
 #endif //COLOR_H

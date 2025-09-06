@@ -1,6 +1,7 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
+#include<stddef.h>
 #include"geometry.h"
 
 typedef enum{
@@ -23,5 +24,7 @@ typedef struct{
 Camera* Camera_new(Point *position, Vector front, Vector up, double fov);
 
 void Camera_ProcessMovement(Camera *camera, CameraMovement movement);
+
+size_t Camera_size(Camera *camera);
 
 #endif

@@ -328,3 +328,36 @@ void Model_sortTriangles(Model *model, Point *point){
 	g_refPoint = point;
 	qsort(model->triangles, model->numTriangles, sizeof(Triangle*), compareTriangles);
 }
+
+size_t Triangle_size(Triangle *t){
+	size_t size = sizeof(*t);
+	size += Point_size(t->a);
+	size += Point_size(t->b);
+	size += Point_size(t->c);
+	return size;
+}
+
+size_t Material_size(Material material){
+	size_t size = 0;
+	size += Color_size(material.color);
+	size += sizeof(material.reflexivity);
+	size += sizeof(material.shininess);
+	return size;
+}
+
+size_t Model_size(Model *model){
+	size_t size = 0;
+
+	size += sizeof(*model);
+	size += model->numTriangles * sizeof(*model->triangles);
+	size += Point_size(model->center);
+
+	for(int i = 0; i < model->numMaterials; i++){
+		size += Material_size(model->materials[i]);
+	}
+	for(int i = 0; i < model->numTriangles; i++){
+		size += Triangle_size(model->triangles[i]);
+	}
+
+	return size;
+}

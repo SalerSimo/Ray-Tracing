@@ -31,6 +31,7 @@ Point*  Point_translate(Point *p, Vector v);
 
 // Debug
 void    Point_print(Point *p);
+int     Point_size(Point *p);
 
 
 // ───── VECTOR ─────
@@ -51,6 +52,7 @@ int     Vector_equal(Vector v1, Vector v2);
 
 // Debug
 void    Vector_print(Vector *v);
+int	  Vector_size(Vector v);
 
 
 // ───── LINE ─────

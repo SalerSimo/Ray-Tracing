@@ -129,3 +129,7 @@ Color Color_multiply(Color c1, Color c2){
 	result.color = (r << 16) | (g << 8) | b;
 	return result;
 }
+
+int Color_size(Color color){
+	return sizeof(color.color);
+}

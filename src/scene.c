@@ -85,3 +85,23 @@ void Light_setAttenuation(Light *light, double constant, double linear, double q
 	light->linear = linear;
 	light->quadratic = quadratic;
 }
+
+size_t Light_size(Light *light){
+	size_t size = sizeof(*light);
+	size += Point_size(light->position);
+	size += Color_size(light->color);
+	return size;
+}
+
+size_t Scene_size(Scene *s){
+	size_t size = sizeof(*s);
+	size += Light_size(s->lightSource);
+	size += Camera_size(s->camera);
+	size += s->numModels * sizeof(*s->models);
+	for(int i = 0; i < s->numModels; i++){
+		size_t m = Model_size(s->models[i]);
+		printf("model %d size: %d bytes\n", i, m);
+		size += m;
+	}
+	return size;
+}

@@ -132,3 +132,17 @@ Point *Line_projectionPoint(Line *l, Point *p){
 	double scale = Vector_dot(v, l->direction) / l->direction.normSquared;
 	return Point_translate(l->origin, Vector_scale(l->direction, scale));
 }
+
+int Point_size(Point *p){
+	return sizeof(p->x) + sizeof(p->y) + sizeof(p->z);
+}
+
+
+int Vector_size(Vector v){
+	int size = 0;
+	size += sizeof(v.x);
+	size += sizeof(v.y);
+	size += sizeof(v.z);
+	size += sizeof(v.normSquared);
+	return size;
+}

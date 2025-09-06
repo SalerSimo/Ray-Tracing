@@ -174,4 +174,10 @@ Triangle *Triangle_init(Point *a, Point *b, Point *c, unsigned char material);
  */
 Vector Triangle_getNormal(Triangle *t);
 
+size_t Triangle_size(Triangle *t);
+
+size_t Material_size(Material material);
+
+size_t Model_size(Model *model);
+
 #endif //MODEL_H

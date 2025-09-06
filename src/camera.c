@@ -62,3 +62,9 @@ void Camera_ProcessMovement(Camera *camera, CameraMovement movement){
             camera->up = Vector_crossProduct(camera->right, camera->front);
       }
 }
+
+size_t Camera_size(Camera *camera){
+      size_t size = sizeof(*camera);
+      size += Point_size(camera->position);
+      return size;
+}

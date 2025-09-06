@@ -73,6 +73,8 @@ void Scene_addModels(Scene *s, Model **models, int numModels);
  */
 void Scene_sortModels(Scene *s);
 
+size_t Scene_size(Scene *s);
+
 
 Light *Light_new(Point *position, double radius, Color lightColor);
 
