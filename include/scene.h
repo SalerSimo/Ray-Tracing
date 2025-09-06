@@ -17,10 +17,9 @@ typedef struct{
 }Light;
 
 /**
- * Represents a 3D scene for ray tracing.
+ * @brief Represents a 3D scene for ray tracing.
  *
- * Contains camera position, light source, and an array of models that define the geometry.
- * It also includes camera-related properties like the viewing distance and rotation angle.
+ * Contains camera object, light source, and an array of models that define the geometry.
  */
 typedef struct{
 	/** Pointer to the camera object in the scene */
