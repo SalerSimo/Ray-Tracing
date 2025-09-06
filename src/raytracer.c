@@ -100,9 +100,7 @@ Color TraceRayR(Scene *scene, Ray *ray, int depth){
 		if(realHit.point != NULL && Vector_dot(Vector_fromPoints(scene->models[i]->center, realHit.point), ray->direction) < 0 && Point_distanceSquared(scene->models[i]->center, realHit.point) > scene->models[i]->boundingRadius * scene->models[i]->boundingRadius){
 			continue;
 		}
-		bool sorted = false;
-		if(depth == 0) sorted = true;
-		Hit currentHit = Model_intersection(scene->models[i], ray, sorted);
+		Hit currentHit = Model_intersection(scene->models[i], ray, false);
 		if(currentHit.point != NULL){
 			float distance = Point_distanceSquared(ray->origin, currentHit.point);
 			if(minDistance == -1 || distance < minDistance){
@@ -264,7 +262,7 @@ Hit Model_intersection(Model *model, Ray *ray, bool triangleSorted){
 				intersection = p;
 				hitTriangle = model->triangles[i];
 				minDistance = distance;
-				//if(triangleSorted) break;
+				if(triangleSorted) break;
 			}
 		}
 	}
