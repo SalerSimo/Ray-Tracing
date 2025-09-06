@@ -138,7 +138,13 @@ Scene *CreateScene(int numObj, char **objs){
 	radius = 1.5;
 	spheres[7] = Model_createSphere(Point_init(-10, floorY+radius, 0), radius, 0, 0.2, COLOR_MAGENTA);
 
-	Light *lightSource = Light_new(Point_init(10, 5, 0), 1, COLOR_WHITE);
+	Vector lightDirection = Vector_normalize(Vector_init(10, 5, 0));
+	int scale = 20;
+	Point* lightPos = Point_translate(Point_init(0, 0, 0), Vector_scale(lightDirection, scale));
+	radius = 0.05;
+	radius = 0;
+	Light *lightSource = Light_new(lightPos, radius * scale, COLOR_WHITE);
+	Light_setAttenuation(lightSource, 1, 0.0000, 0.0000);
 	Scene_fill(scene, lightSource, &floor, 1);
 	Scene_addModels(scene, spheres, numSphere);
 
@@ -149,9 +155,13 @@ Scene *CreateScene(int numObj, char **objs){
 		objects[i] = Model_fromOBJ(objs[i]);
 	}
 
+	Scene_addModels(scene, objects, numObj);
+
 	for(int i = 0; i < scene->numModels; i++){
 		Model_sortTriangles(scene->models[i], scene->camera->position);
 	}
+
+	printf("Scene size is %zu bytes\n", Scene_size(scene));
 
 	return scene;
 }
@@ -214,7 +224,7 @@ void SimulateScene(Scene *scene, SDL_Window *window, int antiAliasingFactor){
 				}
 
 				if(display)
-					Display(scene, window, nThread, 0, antiAliasingFactor);
+					Display(scene, window, nThread, 1, antiAliasingFactor);
 			}
 		}
 		SDL_Delay(50);
@@ -226,7 +236,7 @@ SDL_Window* InitWindow(){
 		printf("ERROR::SDL::Init:%s\n", SDL_GetError());
 		return NULL;
 	}
-	SDL_Window* window = SDL_CreateWindow("RayTracing", WIDTH, HEIGHT, SDL_WINDOW_RESIZABLE);
+	SDL_Window* window = SDL_CreateWindow("Ray Tracing", WIDTH, HEIGHT, SDL_WINDOW_RESIZABLE);
 	if (window == NULL) {
 		printf("ERROR::SDL::CreateWindow::%s\n", SDL_GetError());
 		SDL_Quit();
@@ -235,7 +245,7 @@ SDL_Window* InitWindow(){
 
 	SDL_Surface *icon = SDL_LoadBMP(GetFullPath("icon.bmp"));
 	if (!icon) {
-		printf("Failed to load icon.bmp: %s\n", SDL_GetError());
+		printf("ERROR::SDL::ICON_LOADING::%s\n", SDL_GetError());
 	} else {
 		SDL_SetWindowIcon(window, icon);
 		SDL_DestroySurface(icon);
@@ -301,6 +311,6 @@ void Display(Scene *scene, SDL_Window *window, int nThread, bool verbose, int an
 
 	SDL_UpdateWindowSurface(window);
 	clock_t end = clock();
-	double time = (double)(end - start) / CLOCKS_PER_SEC;
-	if(verbose) printf("loop done, it took %.2f seconds\n", time);
+	double time = (double)(end - start) / CLOCKS_PER_SEC * 1000;
+	if(verbose) printf("Display took %.0f ms\n", time);
 }
