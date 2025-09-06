@@ -8,15 +8,22 @@
 #define LAT_DIVS 20
 #define LON_DIVS 20
 
+/**
+ * Represents the material properties of a 3D model.
+ */
 typedef struct{
+	/** Color of the material. */
 	Color color;
+	/** Model reflection coefficient (0 = no reflection, 1 = perfect mirror). */
 	double reflexivity;
+	/** Model shininess (0 = fully rough, 1 = fully smooth). */
 	double shininess;
 }Material;
 
 typedef struct{
 	Point *a, *b, *c;
-	Color color;
+	/** Index of the material */
+	unsigned char material;
 }Triangle;
 
 typedef enum{
@@ -31,20 +38,18 @@ typedef enum{
  * center point and a bounding radius for optimization (e.g., bounding sphere tests).
  */
 typedef struct{
+	/** Array of materials used by the model. */
+	Material *materials;
+	/** Number of materials used by the model. */
+	int numMaterials;
 	/** Number of triangles of the model. */
 	int numTriangles;
 	/** Array of pointers to Triangle structure. */
 	Triangle **triangles;
 	/** Center of the model. */
 	Point *center;
-	/** Color of the model. */
-	Color color;
 	/** Maximum distance from the center to any point on the model (bounding radius). */
 	double maxDistanceFromCenter;
-	/** Model reflection coefficient (0 = no reflection, 1 = perfect mirror). */
-	double reflexivity;
-	/** Model shininess (0 = fully rough, 1 = fully smooth). */
-	double shininess;
 	/** Type of model. */
 	ModelType type;
 }Model;
@@ -148,6 +153,16 @@ void Model_scale(Model *model, double scalar);
  * @param point Reference point used to calculate distances.
  */
 void Model_sortTriangles(Model *model, Point *point);
+
+/**
+ * @brief Allocates and initializes a new Triangle structure.
+ * @param a Pointer to the first vertex of the triangle.
+ * @param b Pointer to the second vertex of the triangle.
+ * @param c Pointer to the third vertex of the triangle.
+ * @param material Material identifier for the triangle.
+ * @return Pointer to the newly created Triangle structure, or NULL if allocation fails.
+ */
+Triangle *Triangle_init(Point *a, Point *b, Point *c, unsigned char material);
 
 /**
  * Computes and returns the model normal of a triangle.

@@ -4,12 +4,12 @@
 #include<stdint.h>
 #include"model.h"
 
-Triangle *Triangle_init(Point *a, Point *b, Point *c, Color color){
+Triangle *Triangle_init(Point *a, Point *b, Point *c, unsigned char material){
 	Triangle *t = malloc(sizeof(Triangle));
 	t->a = a;
 	t->b = b;
 	t->c = c;
-	t->color = color;
+	t->material = material;
 	return t;
 }
 
@@ -35,10 +35,7 @@ Model *Model_new(){
 	model->numTriangles = 0;
 	model->triangles = NULL;
 	model->center = NULL;
-	model->color = Color_new(0x000000);
 	model->maxDistanceFromCenter = 0;
-	model->reflexivity = 0;
-	model->shininess = 0.5;
 	return model;
 }
 
@@ -80,7 +77,7 @@ Model *Model_createSphere(Point *center, double radius, double reflexivity, doub
 				points[curr],
 				points[next],
 				points[next_right],
-				color
+				0
 			);
 
 			// Triangle 2
@@ -88,16 +85,19 @@ Model *Model_createSphere(Point *center, double radius, double reflexivity, doub
 				points[curr],
 				points[next_right],
 				points[curr_right],
-				color
+				0
 			);
 		}
 	}
 	sphere->maxDistanceFromCenter = radius;
 	sphere->center = center;
-	sphere->color = color;
 	sphere->type = SPHERE;
-	sphere->reflexivity = reflexivity;
-	sphere->shininess = shininess;
+
+	sphere->materials = malloc(sizeof(Material));
+	sphere->numMaterials = 1;
+	sphere->materials[0].color = color;
+	sphere->materials[0].reflexivity = reflexivity;
+	sphere->materials[0].shininess = shininess;
 	return sphere;
 }
 
@@ -131,12 +131,14 @@ Model *Model_createRectXY(Point *origin, double width, double height, double ref
 	rect->numTriangles = 2;
 
 	rect->triangles = malloc(rect->numTriangles *sizeof(Triangle*));
-	rect->triangles[0] = Triangle_init(origin, p1, p2, color);
-	rect->triangles[1] = Triangle_init(p1, p2, p3, color);
+	rect->triangles[0] = Triangle_init(origin, p1, p2, 0);
+	rect->triangles[1] = Triangle_init(p1, p2, p3, 0);
 
-	rect->color = color;
-	rect->reflexivity = reflexivity;
-	rect->shininess = shininess;
+	rect->materials = malloc(sizeof(Material));
+	rect->numMaterials = 1;
+	rect->materials[0].color = color;
+	rect->materials[0].reflexivity = reflexivity;
+	rect->materials[0].shininess = shininess;
 	return rect;
 }
 
@@ -162,12 +164,14 @@ Model *Model_createRectXZ(Point *origin, double width, double height, double ref
 	rect->numTriangles = 2;
 
 	rect->triangles = malloc(rect->numTriangles *sizeof(Triangle*));
-	rect->triangles[0] = Triangle_init(origin, p2, p1, color);
-	rect->triangles[1] = Triangle_init(p1, p2, p3, color);
+	rect->triangles[0] = Triangle_init(origin, p2, p1, 0);
+	rect->triangles[1] = Triangle_init(p1, p2, p3, 0);
 
-	rect->color = color;
-	rect->reflexivity = reflexivity;
-	rect->shininess = shininess;
+	rect->materials = malloc(sizeof(Material));
+	rect->numMaterials = 1;
+	rect->materials[0].color = color;
+	rect->materials[0].reflexivity = reflexivity;
+	rect->materials[0].shininess = shininess;
 	return rect;
 }
 
@@ -193,12 +197,14 @@ Model *Model_createRectYZ(Point *origin, double width, double height, double ref
 	rect->numTriangles = 2;
 
 	rect->triangles = malloc(rect->numTriangles *sizeof(Triangle*));
-	rect->triangles[0] = Triangle_init(origin, p1, p2, color);
-	rect->triangles[1] = Triangle_init(p1, p2, p3, color);
+	rect->triangles[0] = Triangle_init(origin, p1, p2, 0);
+	rect->triangles[1] = Triangle_init(p1, p2, p3, 0);
 
-	rect->color = color;
-	rect->reflexivity = reflexivity;
-	rect->shininess = shininess;
+	rect->materials = malloc(sizeof(Material));
+	rect->numMaterials = 1;
+	rect->materials[0].color = color;
+	rect->materials[0].reflexivity = reflexivity;
+	rect->materials[0].shininess = shininess;
 	return rect;
 }
 
@@ -240,12 +246,15 @@ Model *Model_createBox(Point *origin, double width, double height, double depth,
 
 	for (int i = 0; i < 12; ++i) {
 		int *f = faces[i];
-		box->triangles[i] = Triangle_init(points[f[0]], points[f[1]], points[f[2]], color);
+		box->triangles[i] = Triangle_init(points[f[0]], points[f[1]], points[f[2]], 0);
 	}
 
-	box->color = color;
-	box->reflexivity = reflexivity;
-	box->shininess = shininess;
+
+	box->materials = malloc(sizeof(Material));
+	box->numMaterials = 1;
+	box->materials[0].color = color;
+	box->materials[0].reflexivity = reflexivity;
+	box->materials[0].shininess = shininess;
 	return box;
 }
 

@@ -90,8 +90,13 @@ Model* Model_fromOBJ(const char *fileName) {
 
 	char line[LINE_MAX_LEN];
 	char **colorNames;
-	Color *colors, actualColor = COLOR_WHITE;
+	Color *colors;
 	int numColors;
+	Material *materials = malloc(sizeof(Material));
+	materials[0].color = COLOR_WHITE;
+	materials[0].reflexivity = 0;	
+	materials[0].shininess = 0;
+	int actualMaterial = 0;
 	while (fgets(line, sizeof(line), file)) {
 		if (line[0] == 'v' && line[1] == ' ') {
 			double x, y, z;
@@ -126,11 +131,7 @@ Model* Model_fromOBJ(const char *fileName) {
 				triangles = realloc(triangles, sizeof(Triangle*) * triCapacity);
 			}
 
-			Triangle *t = malloc(sizeof(Triangle));
-			t->a = points[i1 - 1];
-			t->b = points[i2 - 1];
-			t->c = points[i3 - 1];
-			t->color = actualColor;
+			Triangle *t = Triangle_init(points[i1 - 1], points[i2 - 1], points[i3 - 1], actualMaterial);
 			triangles[triCount++] = t;
 		}
 		else{
@@ -138,11 +139,17 @@ Model* Model_fromOBJ(const char *fileName) {
 			if(strcmp(word, "mtllib") == 0){
 				word = strtok(NULL, " \t\r\n");
 				numColors = LoadColors(strcat(directoryPath, word), &colorNames, &colors);
+				materials = malloc(numColors * sizeof(Material));
+				for(int i = 0; i < numColors; i++){
+					materials[i].color = colors[i];
+					materials[i].reflexivity = 0;
+					materials[i].shininess = 0;
+				}
 			}
 			else if(strcmp(word, "usemtl") == 0){
 				word = strtok(NULL, " \t\r\n");
-				int index = getIndex(word, colorNames, numColors);
-				actualColor = colors[index];
+				actualMaterial = getIndex(word, colorNames, numColors);
+				if(actualMaterial < 0) actualMaterial = 0;
 			}
 		}
 	}
@@ -167,13 +174,12 @@ Model* Model_fromOBJ(const char *fileName) {
 	}
 
 	Model *model = malloc(sizeof(Model));
+	model->materials = materials;
+	model->numMaterials = numColors;
 	model->numTriangles = triCount;
 	model->triangles = triangles;
 	model->center = center;
 	model->maxDistanceFromCenter = sqrt(maxDist);
-	model->color = COLOR_WHITE;
-	model->reflexivity = 0.0;
-	model->shininess = 0.0;
 	model->type = GENERIC;
 
 	return model;

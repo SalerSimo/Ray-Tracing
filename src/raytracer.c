@@ -232,11 +232,7 @@ Hit Sphere_intersection(Model *sphere, Ray *ray) {
 	hit.point = intersection;
 	hit.normal = Vector_fromPoints(sphere->center, intersection);
 	hit.model = sphere;
-	Material mat;
-	mat.color = sphere->triangles[0]->color;
-	mat.reflexivity = sphere->reflexivity;
-	mat.shininess = sphere->shininess;
-	hit.material = mat;
+	hit.material = sphere->materials[0];
 
 	return hit;
 }
@@ -279,10 +275,6 @@ Hit Model_intersection(Model *model, Ray *ray, bool triangleSorted){
 	hit.point = intersection;
 	hit.normal = Triangle_getNormal(hitTriangle);
 	hit.model = model;
-	Material mat;
-	mat.color = (hitTriangle)->color;
-	mat.reflexivity = model->reflexivity;
-	mat.shininess = model->shininess;
-	hit.material = mat;
+	hit.material = model->materials[hitTriangle->material];
 	return hit;
 }
