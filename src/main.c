@@ -172,12 +172,7 @@ Scene *CreateScene(int numObj, char **objs){
 	mat.reflexivity = 0;
 	spheres[7] = Model_createSphere(Point_init(-10, floorY+radius, 0), radius, mat);
 
-	Vector lightDirection = Vector_normalize(Vector_init(10, 5, 0));
-	int scale = 50;
-	Point* lightPos = Point_translate(Point_init(0, 0, 0), Vector_scale(lightDirection, scale));
-	radius = 0.05;
-	radius = 0;
-	Light *lightSource = Light_new(lightPos, radius * scale, COLOR_WHITE);
+	Light *lightSource = Light_new(Point_init(15, 10, -1), 2, COLOR_WHITE);
 	Light_setAttenuation(lightSource, 1, 0.0000, 0.0000);
 	Scene_fill(scene, lightSource, &floor, 1);
 	Scene_addModels(scene, spheres, numSphere);
@@ -187,6 +182,8 @@ Scene *CreateScene(int numObj, char **objs){
 	Model **objects = malloc(numObj * sizeof(Model*));
 	for(int i = 0; i < numObj; i++){
 		objects[i] = Model_fromOBJ(objs[i]);
+		Vector translation = Vector_init(0, floorY - objects[i]->center->y + objects[i]->boundingRadius, 0);
+		Model_translate(objects[i], translation);
 	}
 
 	Scene_addModels(scene, objects, numObj);
