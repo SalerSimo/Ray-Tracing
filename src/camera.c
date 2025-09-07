@@ -14,6 +14,7 @@ Camera* Camera_new(Point *position, Vector front, Vector up, float fov){
 
       Camera* camera = malloc(sizeof(Camera));
       if(camera == NULL){
+            printf("ERROR::CAMERA::Failed to allocate memory for Camera\n");
             return NULL;
       }
 

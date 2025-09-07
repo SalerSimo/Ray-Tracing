@@ -60,7 +60,13 @@ void *thread_function(void *args){
 	SDL_Window *window = data->window;
 	
 	Color *colors = NULL;
-	if(data->antiAliasingFactor > 1) colors = malloc(factor * factor * sizeof(Color));
+	if(data->antiAliasingFactor > 1){
+		colors = malloc(factor * factor * sizeof(Color));
+		if(colors == NULL){
+			printf("ERROR::MAIN::THREAD::Failed to allocate memory for color array\n");
+			return NULL;
+		}
+	}
 
 	for(int i = data->starts[index]; i < data->ends[index]; i+=factor){
 		pthread_mutex_lock(&data->mutex[index]);
@@ -128,6 +134,10 @@ Scene *CreateScene(int numObj, char **objs){
 
 	int numSphere = 8;
 	Model **spheres = malloc(numSphere * sizeof(Model*));
+	if(spheres == NULL){
+		printf("ERROR::MAIN::Failed to allocate memory for spheres array\n");
+		return scene;
+	}
 
 	float radius = 10;
 	mat.diffuse = COLOR_GREEN;
@@ -180,6 +190,10 @@ Scene *CreateScene(int numObj, char **objs){
 	if(numObj <= 0) return scene;
 
 	Model **objects = malloc(numObj * sizeof(Model*));
+	if(objects == NULL){
+		printf("ERROR::MAIN::Failed to allocate memory for objects array\n");
+		return scene;
+	}
 	for(int i = 0; i < numObj; i++){
 		objects[i] = Model_fromOBJ(objs[i]);
 		Vector translation = Vector_init(0, floorY - objects[i]->center->y + objects[i]->boundingRadius, 0);
@@ -306,6 +320,10 @@ void Display(Scene *scene, SDL_Window *window, int nThread, bool verbose, int an
 	int *helped = calloc(nThread, sizeof(int));
 	int *threadStates = calloc(nThread, sizeof(int));
 	pthread_mutex_t *mutex = malloc(nThread * sizeof(pthread_mutex_t));
+	if(starts == NULL || ends == NULL || currents == NULL || helped == NULL || threadStates == NULL || mutex == NULL){
+		printf("ERROR::MAIN::Failed to allocate memory for thread control arrays\n");
+		return;
+	}
 	clock_t start = clock();
 
 	for (int i = 0; i < nThread; i++) {
@@ -314,6 +332,10 @@ void Display(Scene *scene, SDL_Window *window, int nThread, bool verbose, int an
 		ends[i] = (i + 1) * surface->w / nThread * antiAliasingFactor;
 
 		threadDatas[i] = malloc(sizeof(ThreadData));
+		if(threadDatas[i] == NULL){
+			printf("ERROR::MAIN::Failed to allocate memory for ThreadData\n");
+			return;
+		}
 		threadDatas[i]->threadStates = threadStates;
 		threadDatas[i]->index = i;
 		threadDatas[i]->nThread = nThread;

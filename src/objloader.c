@@ -24,8 +24,16 @@ int LoadMaterials(char *fileName, char ***names, Material **materials) {
 	int materialCount = -1;
 
 	char **materialNames = malloc(materialCapacity * sizeof(char*));
+	if(materialNames == NULL){
+		printf("ERROR::OBJLOADER::Failed to allocate memory for material names array\n");
+		return 0;
+	}
 
 	Material *mats = malloc(materialCapacity * sizeof(Material));
+	if(mats == NULL){
+		printf("ERROR::OBJLOADER::Failed to allocate memory for material array\n");
+		return 0;
+	}
 
 	char *currentName = NULL;
 	float r, g, b;
@@ -42,7 +50,15 @@ int LoadMaterials(char *fileName, char ***names, Material **materials) {
 			if (materialCount >= materialCapacity) {
 				materialCapacity *= 2;
 				materialNames = realloc(materialNames, materialCapacity * sizeof(char*));
+				if(materialNames == NULL){
+					printf("ERROR::OBJLOADER::Failed to reallocate memory for material names array\n");
+					return 0;
+				}
 				mats = realloc(mats, materialCapacity * sizeof(Material));
+				if(mats == NULL){
+					printf("ERROR::OBJLOADER::Failed to reallocate memory for material array\n");
+					return 0;
+				}
 			}
 		} else if (strcmp(word, "Kd") == 0 && currentName != NULL) {
 			r = atof(strtok(NULL, " \t\r\n"));
@@ -92,10 +108,18 @@ Model* Model_fromOBJ(const char *fileName) {
 	Point **points = NULL;
 	int pointCapacity = 64, pointCount = 0;
 	points = malloc(sizeof(Point*) * pointCapacity);
+	if(points == NULL){
+		printf("ERROR::OBJLOADER::Failed to allocate memory for points array\n");
+		return NULL;
+	}
 
 	Triangle **triangles = NULL;
 	int triCapacity = 64, triCount = 0;
 	triangles = malloc(sizeof(Triangle*) * triCapacity);
+	if(triangles == NULL){
+		printf("ERROR::OBJLOADER::Failed to allocate memory for triangles array\n");
+		return NULL;
+	}
 
 	char line[LINE_MAX_LEN];
 	int numMaterials;
@@ -109,8 +133,16 @@ Model* Model_fromOBJ(const char *fileName) {
 			if (pointCount >= pointCapacity) {
 				pointCapacity *= 2;
 				points = realloc(points, sizeof(Point*) * pointCapacity);
+				if(points == NULL){
+					printf("ERROR::OBJLOADER::Failed to reallocate memory for points array\n");
+					return NULL;
+				}
 			}
 			Point *p = malloc(sizeof(Point));
+			if(p == NULL){
+				printf("ERROR::OBJLOADER::Failed to allocate memory for Point\n");
+				return NULL;
+			}
 			p->x = x; p->y = y; p->z = z;
 			points[pointCount++] = p;
 		} else if (line[0] == 'f' && line[1] == ' ') {
@@ -135,7 +167,7 @@ Model* Model_fromOBJ(const char *fileName) {
 				triCapacity *= 2;
 				triangles = realloc(triangles, sizeof(Triangle*) * triCapacity);
 				if(triangles == NULL){
-					printf("Realloc failed\n");
+					printf("ERROR::OBJLOADER::Failed to reallocate memory for triangles array\n");
 					return NULL;
 				}
 			}
@@ -160,6 +192,10 @@ Model* Model_fromOBJ(const char *fileName) {
 	fclose(file);
 
 	Point *center = malloc(sizeof(Point));
+	if(center == NULL){
+		printf("ERROR::OBJLOADER::Failed to allocate memory for model center\n");
+		return NULL;
+	}
 	center->x = center->y = center->z = 0;
 	for (int i = 0; i < pointCount; i++) {
 		center->x += points[i]->x;
@@ -177,6 +213,10 @@ Model* Model_fromOBJ(const char *fileName) {
 	}
 
 	Model *model = malloc(sizeof(Model));
+	if(model == NULL){
+		printf("ERROR::OBJLOADER::Failed to allocate memory for Model\n");
+		return NULL;
+	}
 	model->materials = materials;
 	model->numMaterials = numMaterials;
 	model->numTriangles = triCount;
@@ -193,7 +233,7 @@ int Model_toOBJ(const Model *model, const char *fileName) {
 
 	FILE *file = fopen(GetFullPath((char *)fileName), "w");
 	if (!file) {
-		perror("Failed to open file for writing");
+		printf("ERROR::OBJLOADER::Failed to open file for writing\n");
 		return -1;
 	}
 

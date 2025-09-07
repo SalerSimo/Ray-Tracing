@@ -6,6 +6,10 @@
 
 Triangle *Triangle_init(Point *a, Point *b, Point *c, unsigned char material){
 	Triangle *t = malloc(sizeof(Triangle));
+	if(t == NULL){
+		printf("ERROR::TRIANGLE::Failed to allocate memory for Triangle\n");
+		return NULL;
+	}
 	t->a = Point_copy(a);
 	t->b = Point_copy(b);
 	t->c = Point_copy(c);
@@ -31,6 +35,10 @@ Vector Triangle_getNormal(Triangle *t){
 
 Model *Model_new(){
 	Model *model = malloc(sizeof(Model));
+	if(model == NULL){
+		printf("ERROR::MODEL::Failed to allocate memory for Model\n");
+		return NULL;
+	}
 	model->type = GENERIC;
 	model->numTriangles = 0;
 	model->triangles = NULL;
@@ -42,6 +50,10 @@ Model *Model_new(){
 Model *Model_createSphere(Point *center, float radius, Material material){
 	int numPoints = (LAT_DIVS + 1) * LON_DIVS;
 	Point **points = malloc(numPoints * sizeof(Point*));
+	if(points == NULL){
+		printf("ERROR::MODEL::Failed to allocate memory for sphere points\n");
+		return NULL;
+	}
 	Model *sphere = Model_new();
 
 	int index = 0;
@@ -61,6 +73,10 @@ Model *Model_createSphere(Point *center, float radius, Material material){
 	// Create triangles
 	int tri_count = LAT_DIVS * LON_DIVS * 2;
 	sphere->triangles = malloc(tri_count * sizeof(Triangle*));
+	if(sphere->triangles == NULL){
+		printf("ERROR::MODEL::Failed to allocate memory for sphere triangles\n");
+		return NULL;
+	}
 	sphere->numTriangles = tri_count;
 	int t = 0;
 	for (int i = 0; i < LAT_DIVS; i++) {
@@ -94,6 +110,10 @@ Model *Model_createSphere(Point *center, float radius, Material material){
 	sphere->type = SPHERE;
 
 	sphere->materials = malloc(sizeof(Material));
+	if(sphere->materials == NULL){
+		printf("ERROR::MODEL::Failed to allocate memory for sphere material\n");
+		return NULL;
+	}
 	sphere->numMaterials = 1;
 	sphere->materials[0] = material;
 	return sphere;
@@ -129,10 +149,18 @@ Model *Model_createRectXY(Point *origin, float width, float height, Material mat
 	rect->numTriangles = 2;
 
 	rect->triangles = malloc(rect->numTriangles *sizeof(Triangle*));
+	if(rect->triangles == NULL){
+		printf("ERROR::MODEL::Failed to allocate memory for rectangle triangles\n");
+		return NULL;
+	}
 	rect->triangles[0] = Triangle_init(origin, p1, p2, 0);
 	rect->triangles[1] = Triangle_init(p1, p2, p3, 0);
 
 	rect->materials = malloc(sizeof(Material));
+	if(rect->materials == NULL){
+		printf("ERROR::MODEL::Failed to allocate memory for rectangle material\n");
+		return NULL;
+	}
 	rect->numMaterials = 1;
 	rect->materials[0] = material;
 	return rect;
@@ -160,10 +188,18 @@ Model *Model_createRectXZ(Point *origin, float width, float height, Material mat
 	rect->numTriangles = 2;
 
 	rect->triangles = malloc(rect->numTriangles *sizeof(Triangle*));
+	if(rect->triangles == NULL){
+		printf("ERROR::MODEL::Failed to allocate memory for rectangle triangles\n");
+		return NULL;
+	}
 	rect->triangles[0] = Triangle_init(origin, p2, p1, 0);
 	rect->triangles[1] = Triangle_init(p1, p2, p3, 0);
 
 	rect->materials = malloc(sizeof(Material));
+	if(rect->materials == NULL){
+		printf("ERROR::MODEL::Failed to allocate memory for rectangle material\n");
+		return NULL;
+	}
 	rect->numMaterials = 1;
 	rect->materials[0] = material;
 	return rect;
@@ -191,10 +227,18 @@ Model *Model_createRectYZ(Point *origin, float width, float height, Material mat
 	rect->numTriangles = 2;
 
 	rect->triangles = malloc(rect->numTriangles *sizeof(Triangle*));
+	if(rect->triangles == NULL){
+		printf("ERROR::MODEL::Failed to allocate memory for rectangle triangles\n");
+		return NULL;
+	}
 	rect->triangles[0] = Triangle_init(origin, p1, p2, 0);
 	rect->triangles[1] = Triangle_init(p1, p2, p3, 0);
 
 	rect->materials = malloc(sizeof(Material));
+	if(rect->materials == NULL){
+		printf("ERROR::MODEL::Failed to allocate memory for rectangle material\n");
+		return NULL;
+	}
 	rect->numMaterials = 1;
 	rect->materials[0] = material;
 	return rect;
@@ -234,7 +278,10 @@ Model *Model_createBox(Point *origin, float width, float height, float depth, Ma
 
 	box->numTriangles = 12;
 	box->triangles = malloc(box->numTriangles * sizeof(Triangle *));
-	if (!box->triangles) return NULL;
+	if(box->triangles == NULL){
+		printf("ERROR::MODEL::Failed to allocate memory for box triangles\n");
+		return NULL;
+	}
 
 	for (int i = 0; i < 12; ++i) {
 		int *f = faces[i];
@@ -243,6 +290,10 @@ Model *Model_createBox(Point *origin, float width, float height, float depth, Ma
 
 
 	box->materials = malloc(sizeof(Material));
+	if(box->materials == NULL){
+		printf("ERROR::MODEL::Failed to allocate memory for box material\n");
+		return NULL;
+	}
 	box->numMaterials = 1;
 	box->materials[0] = material;
 	return box;
