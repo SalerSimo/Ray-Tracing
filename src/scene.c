@@ -4,7 +4,7 @@
 Scene *Scene_init(Camera *camera){
 	Scene *s = malloc(sizeof(Scene*));
 	if(s == NULL){
-		printf("ERROR::SCENE::Memory allocation failed.\n");
+		printf("ERROR::SCENE::Scene_init::Memory allocation failed.\n");
 		return NULL;
 	}
 	s->numModels = 0;

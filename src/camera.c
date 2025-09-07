@@ -8,13 +8,13 @@ float angleStep = 15 * M_PI / 180;
 
 Camera* Camera_new(Point *position, Vector front, Vector up, float fov){
       if(Vector_dot(front, up) != 0){
-            printf("ERROR::CAMERA::Front and Up direction must be perpendicular\n");
+            printf("ERROR::CAMERA::Camera_new::Front and Up direction must be perpendicular\n");
             return NULL;
       }
 
       Camera* camera = malloc(sizeof(Camera));
       if(camera == NULL){
-            printf("ERROR::CAMERA::Failed to allocate memory for Camera\n");
+            printf("ERROR::CAMERA::Camera_new::Failed to allocate memory for Camera\n");
             return NULL;
       }
 

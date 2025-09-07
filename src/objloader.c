@@ -25,13 +25,13 @@ int LoadMaterials(char *fileName, char ***names, Material **materials) {
 
 	char **materialNames = malloc(materialCapacity * sizeof(char*));
 	if(materialNames == NULL){
-		printf("ERROR::OBJLOADER::Failed to allocate memory for material names array\n");
+		printf("ERROR::OBJLOADER::LoadMaterials::Failed to allocate memory for material names array\n");
 		return 0;
 	}
 
 	Material *mats = malloc(materialCapacity * sizeof(Material));
 	if(mats == NULL){
-		printf("ERROR::OBJLOADER::Failed to allocate memory for material array\n");
+		printf("ERROR::OBJLOADER::LoadMaterials::Failed to allocate memory for material array\n");
 		return 0;
 	}
 
@@ -51,12 +51,12 @@ int LoadMaterials(char *fileName, char ***names, Material **materials) {
 				materialCapacity *= 2;
 				materialNames = realloc(materialNames, materialCapacity * sizeof(char*));
 				if(materialNames == NULL){
-					printf("ERROR::OBJLOADER::Failed to reallocate memory for material names array\n");
+					printf("ERROR::OBJLOADER::LoadMaterials::Failed to reallocate memory for material names array\n");
 					return 0;
 				}
 				mats = realloc(mats, materialCapacity * sizeof(Material));
 				if(mats == NULL){
-					printf("ERROR::OBJLOADER::Failed to reallocate memory for material array\n");
+					printf("ERROR::OBJLOADER::LoadMaterials::Failed to reallocate memory for material array\n");
 					return 0;
 				}
 			}
@@ -109,7 +109,7 @@ Model* Model_fromOBJ(const char *fileName) {
 	int pointCapacity = 64, pointCount = 0;
 	points = malloc(sizeof(Point*) * pointCapacity);
 	if(points == NULL){
-		printf("ERROR::OBJLOADER::Failed to allocate memory for points array\n");
+		printf("ERROR::OBJLOADER::Model_fromOBJ::Failed to allocate memory for points array\n");
 		return NULL;
 	}
 
@@ -117,7 +117,7 @@ Model* Model_fromOBJ(const char *fileName) {
 	int triCapacity = 64, triCount = 0;
 	triangles = malloc(sizeof(Triangle*) * triCapacity);
 	if(triangles == NULL){
-		printf("ERROR::OBJLOADER::Failed to allocate memory for triangles array\n");
+		printf("ERROR::OBJLOADER::Model_fromOBJ::Failed to allocate memory for triangles array\n");
 		return NULL;
 	}
 
@@ -134,13 +134,13 @@ Model* Model_fromOBJ(const char *fileName) {
 				pointCapacity *= 2;
 				points = realloc(points, sizeof(Point*) * pointCapacity);
 				if(points == NULL){
-					printf("ERROR::OBJLOADER::Failed to reallocate memory for points array\n");
+					printf("ERROR::OBJLOADER::Model_fromOBJ::Failed to reallocate memory for points array\n");
 					return NULL;
 				}
 			}
 			Point *p = malloc(sizeof(Point));
 			if(p == NULL){
-				printf("ERROR::OBJLOADER::Failed to allocate memory for Point\n");
+				printf("ERROR::OBJLOADER::Model_fromOBJ::Failed to allocate memory for Point\n");
 				return NULL;
 			}
 			p->x = x; p->y = y; p->z = z;
@@ -167,7 +167,7 @@ Model* Model_fromOBJ(const char *fileName) {
 				triCapacity *= 2;
 				triangles = realloc(triangles, sizeof(Triangle*) * triCapacity);
 				if(triangles == NULL){
-					printf("ERROR::OBJLOADER::Failed to reallocate memory for triangles array\n");
+					printf("ERROR::OBJLOADER::Model_fromOBJ::Failed to reallocate memory for triangles array\n");
 					return NULL;
 				}
 			}
@@ -193,7 +193,7 @@ Model* Model_fromOBJ(const char *fileName) {
 
 	Point *center = malloc(sizeof(Point));
 	if(center == NULL){
-		printf("ERROR::OBJLOADER::Failed to allocate memory for model center\n");
+		printf("ERROR::OBJLOADER::Model_fromOBJ::Failed to allocate memory for model center\n");
 		return NULL;
 	}
 	center->x = center->y = center->z = 0;
@@ -214,7 +214,7 @@ Model* Model_fromOBJ(const char *fileName) {
 
 	Model *model = malloc(sizeof(Model));
 	if(model == NULL){
-		printf("ERROR::OBJLOADER::Failed to allocate memory for Model\n");
+		printf("ERROR::OBJLOADER::Model_fromOBJ::Failed to allocate memory for Model\n");
 		return NULL;
 	}
 	model->materials = materials;
@@ -233,7 +233,7 @@ int Model_toOBJ(const Model *model, const char *fileName) {
 
 	FILE *file = fopen(GetFullPath((char *)fileName), "w");
 	if (!file) {
-		printf("ERROR::OBJLOADER::Failed to open file for writing\n");
+		printf("ERROR::OBJLOADER::Model_toOBJ::Failed to open file for writing\n");
 		return -1;
 	}
 

@@ -77,7 +77,7 @@ void Vector_print(Vector *v){
 Point *Point_init(float x, float y, float z){
 	Point *p = malloc(sizeof(Point));
 	if(p == NULL){
-		printf("ERROR::POINT::Failed to allocate memory for Point\n");
+		printf("ERROR::POINT::Point_init::Failed to allocate memory for Point\n");
 		return NULL;
 	}
 	p->x = x;
@@ -101,7 +101,7 @@ float Point_distanceSquared(Point *a, Point *b){
 Line *Line_init(Point *origin, Vector direction){
 	Line *l = malloc(sizeof(Line));
 	if(l == NULL){
-		printf("ERROR::LINE::Failed to allocate memory for Line\n");
+		printf("ERROR::LINE::Line_init::Failed to allocate memory for Line\n");
 		return NULL;
 	}
 	l->origin = origin;

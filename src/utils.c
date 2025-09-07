@@ -10,6 +10,10 @@
 char* GetFullPath(char *fileName){
 	int length = strlen(PROJECT_DIR) + strlen(fileName) + 2;
 	char *fullPath = malloc(length * sizeof(char));
+	if(fullPath == NULL){
+		printf("ERROR::UTILS::GetFullPath::Failed to allocate memory for full path\n");
+		return NULL;
+	}
 	
 	snprintf(fullPath, length, "%s/%s", PROJECT_DIR, fileName);
 	return fullPath;
@@ -28,6 +32,10 @@ char *GetDirectoryPath(char *fullPath){
 	if(last == -1) return strdup("./");
 
 	char *directoryPath = malloc((last + 2) * sizeof(char));
+	if(directoryPath == NULL){
+		printf("ERROR::UTILS::GetDirectoryPath::Failed to allocate memory for directory path\n");
+		return NULL;
+	}
 	for(int i = 0; i < last + 1; i++){
 		directoryPath[i] = fullPath[i];
 	}

@@ -63,7 +63,7 @@ void *thread_function(void *args){
 	if(data->antiAliasingFactor > 1){
 		colors = malloc(factor * factor * sizeof(Color));
 		if(colors == NULL){
-			printf("ERROR::MAIN::THREAD::Failed to allocate memory for color array\n");
+			printf("ERROR::MAIN::thread_function::Failed to allocate memory for color array\n");
 			return NULL;
 		}
 	}
@@ -135,7 +135,7 @@ Scene *CreateScene(int numObj, char **objs){
 	int numSphere = 8;
 	Model **spheres = malloc(numSphere * sizeof(Model*));
 	if(spheres == NULL){
-		printf("ERROR::MAIN::Failed to allocate memory for spheres array\n");
+		printf("ERROR::MAIN::CreateScene::Failed to allocate memory for spheres array\n");
 		return scene;
 	}
 
@@ -191,7 +191,7 @@ Scene *CreateScene(int numObj, char **objs){
 
 	Model **objects = malloc(numObj * sizeof(Model*));
 	if(objects == NULL){
-		printf("ERROR::MAIN::Failed to allocate memory for objects array\n");
+		printf("ERROR::MAIN::CreateScene::Failed to allocate memory for objects array\n");
 		return scene;
 	}
 	for(int i = 0; i < numObj; i++){
@@ -274,7 +274,7 @@ void SimulateScene(Scene *scene, SDL_Window *window, int antiAliasingFactor){
 
 SDL_Window* InitWindow(){
 	if (SDL_Init(SDL_INIT_VIDEO) == 0) {
-		printf("ERROR::SDL::Init:%s\n", SDL_GetError());
+		printf("ERROR::SDL::Init::%s\n", SDL_GetError());
 		return NULL;
 	}
 	SDL_Window* window = SDL_CreateWindow("Ray Tracing", WIDTH, HEIGHT, SDL_WINDOW_RESIZABLE);
@@ -321,7 +321,7 @@ void Display(Scene *scene, SDL_Window *window, int nThread, bool verbose, int an
 	int *threadStates = calloc(nThread, sizeof(int));
 	pthread_mutex_t *mutex = malloc(nThread * sizeof(pthread_mutex_t));
 	if(starts == NULL || ends == NULL || currents == NULL || helped == NULL || threadStates == NULL || mutex == NULL){
-		printf("ERROR::MAIN::Failed to allocate memory for thread control arrays\n");
+		printf("ERROR::MAIN::Display::Failed to allocate memory for thread control arrays\n");
 		return;
 	}
 	clock_t start = clock();
@@ -333,7 +333,7 @@ void Display(Scene *scene, SDL_Window *window, int nThread, bool verbose, int an
 
 		threadDatas[i] = malloc(sizeof(ThreadData));
 		if(threadDatas[i] == NULL){
-			printf("ERROR::MAIN::Failed to allocate memory for ThreadData\n");
+			printf("ERROR::MAIN::Display::Failed to allocate memory for ThreadData\n");
 			return;
 		}
 		threadDatas[i]->threadStates = threadStates;
