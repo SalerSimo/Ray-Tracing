@@ -61,8 +61,6 @@ int LoadMaterials(char *fileName, char ***names, Material **materials) {
 		}
 		else if (strcmp(word, "Ns") == 0 && currentName != NULL) {
 			int exp = atoi(strtok(NULL, " \t\r\n"));
-			printf("%d\n", exp);
-
 			mats[materialCount].specularExponent = exp;
 		}
 	}
