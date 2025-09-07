@@ -16,6 +16,7 @@ A ray tracer software that renders a 3D scenes with realistic lighting, reflecti
 - **A / D** → Move left / right
 - **R / F** → Move up / down
 - **Q / E** → Rotate camera left / right
+- **T / G** → Rotate camera up / down
 
 ## Demo
 ### Rendering:
