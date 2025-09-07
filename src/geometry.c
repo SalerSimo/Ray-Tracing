@@ -114,19 +114,6 @@ float Line_Point_distance(Line *l, Point *p){
 	return distance;
 }
 
-Plane *Plane_new(float A, float B, float C, float D){
-	Plane *plane = malloc(sizeof(Plane));
-	plane->A = A;
-	plane->B = B;
-	plane->C = C;
-	plane->D = D;
-	return plane;
-}
-
-Vector Plane_vectorNormal(Plane *plane){
-	return Vector_init(plane->A, plane->B, plane->C);
-}
-
 Point *Line_projectionPoint(Line *l, Point *p){
 	Vector v = Vector_fromPoints(l->origin, p);
 	float scale = Vector_dot(v, l->direction) / l->direction.normSquared;

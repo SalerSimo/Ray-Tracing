@@ -15,9 +15,6 @@ typedef struct{
 	Vector direction;
 }Line;
 
-typedef struct{
-	float A, B, C, D;
-}Plane;
 
 
 // ───── POINT ─────
@@ -65,17 +62,7 @@ Line*   Line_init(Point *origin, Vector direction);
 float  Line_Point_distance(Line *l, Point *p);
 Point*  Line_projectionPoint(Line *l, Point *p);
 
-// Debug
-void    Line_print(Line *l);
 
-
-// ───── PLANE ─────
-
-// Constructor
-Plane*  Plane_new(float A, float B, float C, float D);
-
-// Operations
-Vector  Plane_vectorNormal(Plane *plane);
 
 
 #endif // GEOMETRY_H
