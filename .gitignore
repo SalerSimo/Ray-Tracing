@@ -4,3 +4,5 @@ run/
 RayTracing.exe
 *.mtl
 *.obj
+!models/*.obj
+!models/*.mtl
