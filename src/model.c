@@ -4,34 +4,6 @@
 #include<stdint.h>
 #include"model.h"
 
-Triangle *Triangle_init(Point *a, Point *b, Point *c, unsigned char material){
-	Triangle *t = malloc(sizeof(Triangle));
-	if(t == NULL){
-		printf("ERROR::TRIANGLE::Triangle_init::Failed to allocate memory for Triangle\n");
-		return NULL;
-	}
-	t->a = Point_copy(a);
-	t->b = Point_copy(b);
-	t->c = Point_copy(c);
-	t->material = material;
-	return t;
-}
-
-float Triangle_area(Triangle *t){
-	Vector ab, ac;
-	ab = Vector_fromPoints(t->a, t->b);
-	ac = Vector_fromPoints(t->a, t->c);
-	Vector v = Vector_crossProduct(ab, ac);
-	return sqrt(v.normSquared) / 2;
-}
-
-Vector Triangle_getNormal(Triangle *t){
-	Vector ab, ac;
-	ab = Vector_fromPoints(t->a, t->b);
-	ac = Vector_fromPoints(t->a, t->c);
-	Vector normal = Vector_crossProduct(ab, ac);
-	return Vector_normalize(normal);
-}
 
 Model *Model_new(){
 	Model *model = malloc(sizeof(Model));
@@ -117,14 +89,6 @@ Model *Model_createSphere(Point *center, float radius, Material material){
 	sphere->numMaterials = 1;
 	sphere->materials[0] = material;
 	return sphere;
-}
-
-float Model_area(Model *model){
-	float area = 0;
-	for(int i = 0; i < model->numTriangles; i++){
-		area += Triangle_area(model->triangles[i]);
-	}
-	return area;
 }
 
 Model *Model_createRectXY(Point *origin, float width, float height, Material material){
@@ -299,11 +263,6 @@ Model *Model_createBox(Point *origin, float width, float height, float depth, Ma
 	return box;
 }
 
-void Triangle_translate(Triangle *t, Vector translation){
-	t->a = Point_translate(t->a, translation);
-	t->b = Point_translate(t->b, translation);
-	t->c = Point_translate(t->c, translation);
-}
 
 void Model_translate(Model *model, Vector translation){
 	if(model == NULL) return;
@@ -337,17 +296,8 @@ void Model_scale(Model *model, float scalar){
 	}
 }
 
-Point *Triangle_center(Triangle *t){
-	Point *center = Point_init(0, 0, 0);
-	center->x = (t->a->x + t->b->x + t->c->x) / 3;
-	center->y = (t->a->y + t->b->y + t->c->y) / 3;
-	center->z = (t->a->z + t->b->z + t->c->z) / 3;
-
-	return center;
-}
 
 static Point *g_refPoint;
-
 int compareTriangles(const void *a, const void *b) {
 	Triangle *t1 = *(Triangle **)a;
 	Triangle *t2 = *(Triangle **)b;
@@ -367,13 +317,7 @@ void Model_sortTriangles(Model *model, Point *point){
 	qsort(model->triangles, model->numTriangles, sizeof(Triangle*), compareTriangles);
 }
 
-size_t Triangle_size(Triangle *t){
-	size_t size = sizeof(*t);
-	size += Point_size(t->a);
-	size += Point_size(t->b);
-	size += Point_size(t->c);
-	return size;
-}
+
 
 size_t Material_size(Material material){
 	return sizeof(material);

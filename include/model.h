@@ -4,6 +4,7 @@
 #include<stdint.h>
 #include"geometry.h"
 #include"color.h"
+#include"triangle.h"
 
 #define LAT_DIVS 20
 #define LON_DIVS 20
@@ -24,11 +25,8 @@ typedef struct{
 	float reflexivity;
 }Material;
 
-typedef struct{
-	Point *a, *b, *c;
-	/** Index of the material */
-	unsigned char material;
-}Triangle;
+Material Material_new(Color diffuse, float ambient, Color specular, int specularExponent, float reflexivity);
+
 
 typedef enum{
 	GENERIC, SPHERE, LIGHT
@@ -148,27 +146,7 @@ void Model_scale(Model *model, float scalar);
  */
 void Model_sortTriangles(Model *model, Point *point);
 
-/**
- * @brief Allocates and initializes a new Triangle structure.
- * @param a Pointer to the first vertex of the triangle.
- * @param b Pointer to the second vertex of the triangle.
- * @param c Pointer to the third vertex of the triangle.
- * @param material Material identifier for the triangle.
- * @return Pointer to the newly created Triangle structure, or NULL if allocation fails.
- */
-Triangle *Triangle_init(Point *a, Point *b, Point *c, unsigned char material);
 
-/**
- * Computes and returns the model normal of a triangle.
- * The normal is calculated using the cross product of two edges of the triangle,
- * and is normalized to 1 unit length.
- *
- * @param t Pointer to the Triangle.
- * @return The normal Vector of the triangle.
- */
-Vector Triangle_getNormal(Triangle *t);
-
-size_t Triangle_size(Triangle *t);
 
 size_t Material_size(Material material);
 
